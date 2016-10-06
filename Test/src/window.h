@@ -23,8 +23,7 @@ QT_END_NAMESPACE
 
 namespace bricolage {
 	
-class Window : public QMainWindow, private Ui::Window
-{
+class Window : public QMainWindow, private Ui::Window{
     Q_OBJECT
 
 private:

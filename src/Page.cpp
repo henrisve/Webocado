@@ -59,14 +59,23 @@ void Page::updatePage(Page &newPage){
     mPageID=newPage.mPageID;
     mURL=newPage.mURL;
     ComputedStyleList=newPage.ComputedStyleList;
-
-    copyPage(mBentoTree->mRootBlock,newPage.mBentoTree->mRootBlock);
+    qDebug() << "this:" << mBentoTree->mRootBlock->mChildren.size() << endl;
+    qDebug() << "new" << newPage.mBentoTree->mRootBlock->mChildren.size() << endl;
+    if(newPage.mBentoTree!=this->mBentoTree){
+        copyPage(mBentoTree->mRootBlock,newPage.mBentoTree->mRootBlock);
+    }else{
+        qDebug()<< endl<< endl<< endl << "alredy same??" << endl<< endl<< endl<< endl;
+    }
+    qDebug() << "thisafter:" << mBentoTree->mRootBlock->mChildren.size() << endl;
+    qDebug() << "newafter:" << newPage.mBentoTree->mRootBlock->mChildren.size() << endl;
 
 }
 
 //should be under BentoBlock.h (or .cpp)??
 void Page::copyPage(BentoBlock* copyBlock,BentoBlock* orgBlock){
-
+    if(orgBlock->mLevel == 0) qDebug() << "c0" << "this:" << orgBlock->mChildren.size() << endl;
+    if(orgBlock->mLevel == 0) qDebug() << "c0.5" << "this:" << copyBlock->mChildren.size() << endl;
+    if(orgBlock->mLevel == 0) qDebug() << "c1" << "this:" << mBentoTree->mRootBlock->mChildren.size() << endl;
     copyBlock->mBentoID=orgBlock->mBentoID; //This is probably pointers, soo maybe need the data??
     copyBlock->mbgColor=orgBlock->mbgColor;
     copyBlock->mborderColor=orgBlock->mborderColor;
@@ -82,21 +91,26 @@ void Page::copyPage(BentoBlock* copyBlock,BentoBlock* orgBlock){
     copyBlock->mSameSizeContent=orgBlock->mSameSizeContent;
     copyBlock->mtColor=orgBlock->mtColor;
     copyBlock->mComputedStyles=orgBlock->mComputedStyles;
-
+    if(orgBlock->mLevel == 0) qDebug() << "c2" << "this:" << mBentoTree->mRootBlock->mChildren.size() << endl;
     if(copyBlock->mDomNodeID>0){ // why
         copyBlock->mDOMNode = mDOMNodes[copyBlock->mDomNodeID];
+        if(orgBlock->mLevel == 0) qDebug() << ".";
+    }else{
+        qDebug() << "*";
     }
-
-
+    if(orgBlock->mLevel == 0) qDebug() << "c3" << "this:" << mBentoTree->mRootBlock->mChildren.size() << endl;
+    if(orgBlock->mLevel == 0 && copyBlock == orgBlock)qDebug() << "ncitfu"<< endl;
     copyBlock->mChildren.clear(); //should already be clear, except for maybe first time!
-
+    if(orgBlock->mLevel == 0) qDebug() << "c4.size" << "this:" << orgBlock->mChildren.size() << endl;
     for (int i=0; i<orgBlock->mChildren.size(); i++) {
         copyBlock->mChildren.append(new BentoBlock);
         copyBlock->mChildren[i]->mParent=copyBlock;
 
         copyPage(copyBlock->mChildren[i],orgBlock->mChildren[i]);
     }
-
+    if(orgBlock->mLevel == 0)qDebug() << "c5" << "this:" << mBentoTree->mRootBlock->mChildren.size() << endl;
+    if(orgBlock->mLevel == 0)qDebug() << "c6.size" << "this:" << orgBlock->mChildren.size() << endl;
+    if(orgBlock->mLevel == 0)qDebug() << "c7.size" << "this:" << copyBlock->mChildren.size() << endl;
 
 //    qDebug()<< "-----------------------this is where --------------------------------" << orgBlock->mBentoID << this->mPageID;;
 
@@ -122,16 +136,22 @@ void Page::copyPage(BentoBlock* copyBlock,BentoBlock* orgBlock){
 
 
 void Page::updateStyleList(BentoBlock* bentoBlock){
+    if(bentoBlock->mLevel==0 && bentoBlock->mChildren.size()==0){
+        qDebug() <<"fee";
+    }
     QHash<QString, QString> ComputedStyles = bentoBlock->getStyles();
     QList<QString> keys = ComputedStyles.keys();
     //Qlist<QString> temp;
     foreach (QString key, keys) {
         QString styleValue = ComputedStyles.value(key);
+        //if(key == "height") qDebug() << "hstyleValue:" << styleValue;
         int index=addStyles(styleValue,key);
 
         int size=ComputedStyleList.value(key).size();
+        //if(key == "height") qDebug() << "hstyleSize:" << size;
         bentoBlock->setStyles(index,key,size);
     }
+    //qDebug() << bentoBlock->mChildren.size();
     for(int i=0; i<bentoBlock->mChildren.size(); i++) {
         updateStyleList(bentoBlock->mChildren[i]);
     }

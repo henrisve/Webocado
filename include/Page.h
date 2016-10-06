@@ -10,6 +10,7 @@
 #include <QWebFrame>
 #include <QWebPage>
 #include "BentoTree.h"
+#include <qdebug.h>
 
 namespace bricolage {
 
@@ -65,7 +66,9 @@ public:
 
     inline void updateStyleList(){
         ComputedStyleList.clear();
+
         updateStyleList(mBentoTree->mRootBlock);
+        qDebug() << "UP2" << ComputedStyleList["height"].size() <<endl;
         updateStyleList(mBentoTree->mRootBlock);
     }
 
@@ -87,6 +90,9 @@ public:
 
 
 private:
+    double fitness;
+    double diffFitness;  //Not used yet, bet should be better that way
+
     //for the copy of pages!
     void copyPage(BentoBlock* copyBlock,BentoBlock* orgBlock);
 

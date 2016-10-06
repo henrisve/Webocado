@@ -15,7 +15,10 @@
 namespace webocado{
     class igacado{
     public:
-        void mutateColor();
+        inline void mutate(){
+            for(int i=0; i<populationSize; i++) mutate(i);
+        }
+        void mutate(int i);
         void mutateColor(int i);
         void crossover();
         void nextIndividual(double fitness);//bool like,int time);
@@ -33,20 +36,33 @@ namespace webocado{
 
 
     private:
-        static const QStringList swapList;
-        static const QStringList sizeList;
+        static const QStringList positionKeyList;
+        static const QStringList sizeKeyList;
+        static const QStringList textKeyList;
+        static const QStringList otherKeyList;
+        static const QStringList borderKeyList;
+        static const QStringList colorKeyList;
+        //and here shold be color if we did that same way...
 
         //private function
+        QStringList getEvolKeys();
         void crossOverBasic(bricolage::Page* mPage1, bricolage::Page* mPage2);
-        void mutateSize(bricolage::Page *mPage, QString key, bool negativeOk, int unicorn);
+        void mutateNumeric(bricolage::Page *mPage, QString key, int unicorn);
         void nextGeneration();
         void changeColor(int popIndex, int noOfColors, int r, int g, int b);
         void rotateColor(bricolage::Page *mPage,int index,int dh,int ds, int dl);
         void replace(bricolage::Page *oldPage, bricolage::Page *newPage);
         void newColor(QVector<QColor>* currColors,int colorSize);
         void updateSettings();
+        void updateSettingWidgets();
         inline void newColor(QVector<QColor>* currColors) {
             newColor(currColors,currColors->size()+1); //if colorsize is empty, add one.
+        }
+        int gaussLevel;
+        int gaussSigma;
+        inline double gaussian(int level){
+            int r=(level-gaussLevel);
+            return (exp(-(r*r)/gaussSigma));
         }
 
         void mutateElementColor(bricolage::Page *mpage,bricolage::BentoBlock *bentoBlock, int ColorSize);
@@ -56,7 +72,7 @@ namespace webocado{
         int tournamentSelection(QList<QPair<double,int> > array, double tournamentSelectionParameter);
         // int tournamentSelection(QList<int> indexlist,QList<double> fitnesslist);
 
-        uint fullSize(const bricolage::BentoBlock* bentoBlock);
+        //uint fullSize(const bricolage::BentoBlock* bentoBlock);
         //privade variables
 
         int currGeneration;
@@ -104,6 +120,7 @@ namespace webocado{
         //fitness etc:
         QList<double> fitnessList;
         QList<bricolage::Page> *population;
+        QList<QPair<double, QStringList> > evolveType;
 
         //            //For randomness:
 
@@ -147,10 +164,10 @@ namespace webocado{
             QList<double> list2=getNumberFromQString2(e2);
 
             if(!list1.isEmpty()&&!list2.isEmpty()){
-                qDebug() << endl << e1 << list1[0] << e2 << list2[0] << "is a number" << (list1[0] < list2[0]?"<":">") << endl;
+                //qDebug() << endl << e1 << list1[0] << e2 << list2[0] << "is a number" << (list1[0] < list2[0]?"<":">") << endl;
                 return list1[0] < list2[0];
             }
-            qDebug() << endl << e1 << e2 << "is non number"<< (e1 < e2?"<":">")<< endl;
+            //qDebug() << endl << e1 << e2 << "is non number"<< (e1 < e2?"<":">")<< endl;
             return e1<e2;
         }
         static QList<double> getNumberFromQString2(const QString &str){ //Move to a common file..

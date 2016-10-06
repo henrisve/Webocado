@@ -98,7 +98,7 @@
            </size>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab">
            <attribute name="title">
@@ -476,8 +476,8 @@
      <item>
       <widget class="QPlainTextEdit" name="webURLs">
        <property name="plainText">
-        <string>csss
-csss</string>
+        <string>csssm
+csstm</string>
        </property>
       </widget>
      </item>
@@ -556,12 +556,229 @@ csss</string>
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>0</y>
+          <y>-525</y>
           <width>282</width>
-          <height>1464</height>
+          <height>1828</height>
          </rect>
         </property>
         <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="1">
+          <widget class="QLabel" name="label_29">
+           <property name="text">
+            <string>Proba mutation</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_30">
+           <property name="text">
+            <string>size</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QDoubleSpinBox" name="S_sizeChangeProba">
+           <property name="decimals">
+            <number>4</number>
+           </property>
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.005000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_31">
+           <property name="text">
+            <string>swap</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QDoubleSpinBox" name="S_swapPropa">
+           <property name="decimals">
+            <number>4</number>
+           </property>
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.005000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>RndCol</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QDoubleSpinBox" name="S_ColorRand">
+           <property name="decimals">
+            <number>4</number>
+           </property>
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.025000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>RotCol</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QDoubleSpinBox" name="S_ColorRot">
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>1.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLabel" name="label_32">
+           <property name="text">
+            <string>Proba Crossover</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="label_35">
+           <property name="text">
+            <string>Keeplen</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QDoubleSpinBox" name="S_BasicCrossKeepLengthProb">
+           <property name="decimals">
+            <number>4</number>
+           </property>
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.005000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="label_36">
+           <property name="text">
+            <string>Basic</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QDoubleSpinBox" name="S_BasicCrossProba">
+           <property name="decimals">
+            <number>4</number>
+           </property>
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.005000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="label_37">
+           <property name="text">
+            <string>B_key</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="1">
+          <widget class="QDoubleSpinBox" name="S_BasicCrossProbaKey">
+           <property name="decimals">
+            <number>4</number>
+           </property>
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.005000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="0">
+          <widget class="QLabel" name="label_38">
+           <property name="text">
+            <string>B_value</string>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="1">
+          <widget class="QDoubleSpinBox" name="S_BasicCrossProbaValue">
+           <property name="decimals">
+            <number>4</number>
+           </property>
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.005000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="0">
+          <widget class="QLabel" name="label_33">
+           <property name="text">
+            <string>aa</string>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="1">
+          <widget class="QDoubleSpinBox" name="S_Crossover_All">
+           <property name="decimals">
+            <number>4</number>
+           </property>
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.005000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="11" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>Color</string>
+           </property>
+          </widget>
+         </item>
+         <item row="11" column="1">
+          <widget class="QDoubleSpinBox" name="S_ColorCross">
+           <property name="decimals">
+            <number>4</number>
+           </property>
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.010000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.010000000000000</double>
+           </property>
+          </widget>
+         </item>
          <item row="12" column="1">
           <widget class="QLabel" name="label">
            <property name="text">
@@ -581,8 +798,14 @@ csss</string>
            <property name="decimals">
             <number>4</number>
            </property>
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.010000000000000</double>
+           </property>
            <property name="value">
-            <double>0.005000000000000</double>
+            <double>0.010000000000000</double>
            </property>
           </widget>
          </item>
@@ -598,8 +821,14 @@ csss</string>
            <property name="decimals">
             <number>4</number>
            </property>
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.010000000000000</double>
+           </property>
            <property name="value">
-            <double>0.002000000000000</double>
+            <double>0.010000000000000</double>
            </property>
           </widget>
          </item>
@@ -726,6 +955,70 @@ csss</string>
          <item row="40" column="1">
           <widget class="QDoubleSpinBox" name="S_Colorlig_M"/>
          </item>
+         <item row="43" column="1">
+          <widget class="QLabel" name="label_25">
+           <property name="text">
+            <string>Mutation of Size</string>
+           </property>
+          </widget>
+         </item>
+         <item row="44" column="0">
+          <widget class="QLabel" name="label_27">
+           <property name="text">
+            <string>F</string>
+           </property>
+          </widget>
+         </item>
+         <item row="44" column="1">
+          <widget class="QDoubleSpinBox" name="S_Size_fitness">
+           <property name="decimals">
+            <number>2</number>
+           </property>
+           <property name="minimum">
+            <double>-100.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>100.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.100000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="45" column="0">
+          <widget class="QLabel" name="label_24">
+           <property name="text">
+            <string>Mean</string>
+           </property>
+          </widget>
+         </item>
+         <item row="45" column="1">
+          <widget class="QDoubleSpinBox" name="S_Size_mean">
+           <property name="decimals">
+            <number>1</number>
+           </property>
+           <property name="minimum">
+            <double>-100.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="46" column="0">
+          <widget class="QLabel" name="label_26">
+           <property name="text">
+            <string>std</string>
+           </property>
+          </widget>
+         </item>
+         <item row="46" column="1">
+          <widget class="QDoubleSpinBox" name="S_Size_std">
+           <property name="decimals">
+            <number>1</number>
+           </property>
+           <property name="value">
+            <double>5.000000000000000</double>
+           </property>
+          </widget>
+         </item>
          <item row="47" column="1">
           <widget class="QLabel" name="label_7">
            <property name="text">
@@ -742,113 +1035,21 @@ csss</string>
          </item>
          <item row="49" column="1">
           <widget class="QDoubleSpinBox" name="S_evolTs">
+           <property name="maximum">
+            <double>1.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.050000000000000</double>
+           </property>
            <property name="value">
             <double>0.700000000000000</double>
            </property>
           </widget>
          </item>
-         <item row="51" column="0">
-          <widget class="QLabel" name="label_9">
+         <item row="50" column="0">
+          <widget class="QLabel" name="label_28">
            <property name="text">
-            <string>htime(ms)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="51" column="1">
-          <widget class="QDoubleSpinBox" name="S_TimeFitness">
-           <property name="maximum">
-            <double>2000.000000000000000</double>
-           </property>
-           <property name="value">
-            <double>2000.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="56" column="1">
-          <widget class="QLabel" name="label_22">
-           <property name="text">
-            <string>Population</string>
-           </property>
-          </widget>
-         </item>
-         <item row="57" column="0">
-          <widget class="QLabel" name="label_23">
-           <property name="text">
-            <string>&quot;size&quot;</string>
-           </property>
-          </widget>
-         </item>
-         <item row="57" column="1">
-          <widget class="QDoubleSpinBox" name="S_PopSize">
-           <property name="decimals">
-            <number>0</number>
-           </property>
-           <property name="minimum">
-            <double>2.000000000000000</double>
-           </property>
-           <property name="value">
-            <double>5.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="45" column="1">
-          <widget class="QDoubleSpinBox" name="S_Size_mean">
-           <property name="decimals">
-            <number>1</number>
-           </property>
-           <property name="minimum">
-            <double>-100.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="45" column="0">
-          <widget class="QLabel" name="label_24">
-           <property name="text">
-            <string>Mean</string>
-           </property>
-          </widget>
-         </item>
-         <item row="43" column="1">
-          <widget class="QLabel" name="label_25">
-           <property name="text">
-            <string>Mutation of Size</string>
-           </property>
-          </widget>
-         </item>
-         <item row="46" column="1">
-          <widget class="QDoubleSpinBox" name="S_Size_std">
-           <property name="decimals">
-            <number>1</number>
-           </property>
-           <property name="value">
-            <double>5.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="46" column="0">
-          <widget class="QLabel" name="label_26">
-           <property name="text">
-            <string>std</string>
-           </property>
-          </widget>
-         </item>
-         <item row="44" column="1">
-          <widget class="QDoubleSpinBox" name="S_Size_fitness">
-           <property name="decimals">
-            <number>4</number>
-           </property>
-           <property name="minimum">
-            <double>-100.000000000000000</double>
-           </property>
-           <property name="maximum">
-            <double>100.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="44" column="0">
-          <widget class="QLabel" name="label_27">
-           <property name="text">
-            <string>F</string>
+            <string>T-Size</string>
            </property>
           </widget>
          </item>
@@ -865,204 +1066,247 @@ csss</string>
            </property>
           </widget>
          </item>
-         <item row="50" column="0">
-          <widget class="QLabel" name="label_28">
+         <item row="51" column="0">
+          <widget class="QLabel" name="label_9">
            <property name="text">
-            <string>T-Size</string>
+            <string>htime(ms)</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QLabel" name="label_29">
-           <property name="text">
-            <string>Proba mutation</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QDoubleSpinBox" name="S_sizeChangeProba">
+         <item row="51" column="1">
+          <widget class="QDoubleSpinBox" name="S_TimeFitness">
            <property name="decimals">
-            <number>4</number>
+            <number>0</number>
+           </property>
+           <property name="minimum">
+            <double>100.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>120000.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>100.000000000000000</double>
            </property>
            <property name="value">
-            <double>0.005000000000000</double>
+            <double>2000.000000000000000</double>
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_30">
+         <item row="61" column="1">
+          <widget class="QLabel" name="label_40">
            <property name="text">
-            <string>size</string>
+            <string>Gauss tree Level</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
-          <widget class="QDoubleSpinBox" name="S_swapPropa">
+         <item row="62" column="0">
+          <widget class="QLabel" name="label_39">
+           <property name="text">
+            <string>Level</string>
+           </property>
+          </widget>
+         </item>
+         <item row="62" column="1">
+          <widget class="QDoubleSpinBox" name="S_gaussLevel">
            <property name="decimals">
-            <number>4</number>
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <double>100.000000000000000</double>
            </property>
            <property name="value">
-            <double>0.005000000000000</double>
+            <double>0.000000000000000</double>
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_31">
+         <item row="63" column="0">
+          <widget class="QLabel" name="label_41">
            <property name="text">
-            <string>swap</string>
+            <string>Sigma</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="1">
-          <widget class="QLabel" name="label_32">
-           <property name="text">
-            <string>Proba Crossover</string>
-           </property>
-          </widget>
-         </item>
-         <item row="10" column="1">
-          <widget class="QDoubleSpinBox" name="S_Crossover_All">
+         <item row="63" column="1">
+          <widget class="QDoubleSpinBox" name="S_gaussSigma">
            <property name="decimals">
-            <number>4</number>
+            <number>1</number>
            </property>
-           <property name="value">
-            <double>0.005000000000000</double>
+           <property name="maximum">
+            <double>100.000000000000000</double>
            </property>
-          </widget>
-         </item>
-         <item row="10" column="0">
-          <widget class="QLabel" name="label_33">
-           <property name="text">
-            <string>aa</string>
+           <property name="singleStep">
+            <double>1.000000000000000</double>
            </property>
-          </widget>
-         </item>
-         <item row="11" column="1">
-          <widget class="QDoubleSpinBox" name="S_ColorCross"/>
-         </item>
-         <item row="11" column="0">
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>Color</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QDoubleSpinBox" name="S_ColorRand">
-           <property name="decimals">
-            <number>4</number>
-           </property>
-           <property name="value">
-            <double>0.025000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>RndCol</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QDoubleSpinBox" name="S_ColorRot">
            <property name="value">
             <double>1.000000000000000</double>
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>RotCol</string>
-           </property>
-          </widget>
-         </item>
-         <item row="54" column="1">
+         <item row="64" column="1">
           <widget class="Line" name="line">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
           </widget>
          </item>
-         <item row="55" column="1">
+         <item row="66" column="1">
           <widget class="QLabel" name="label_34">
            <property name="text">
             <string>Before Start:</string>
            </property>
           </widget>
          </item>
-         <item row="6" column="1">
-          <widget class="QDoubleSpinBox" name="S_BasicCrossKeepLengthProb">
+         <item row="68" column="1">
+          <widget class="QLabel" name="label_22">
+           <property name="text">
+            <string>Population</string>
+           </property>
+          </widget>
+         </item>
+         <item row="69" column="0">
+          <widget class="QLabel" name="label_23">
+           <property name="text">
+            <string>&quot;size&quot;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="69" column="1">
+          <widget class="QDoubleSpinBox" name="S_PopSize">
            <property name="decimals">
-            <number>4</number>
+            <number>0</number>
+           </property>
+           <property name="minimum">
+            <double>2.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>5.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="55" column="1">
+          <widget class="QDoubleSpinBox" name="S_Selective_Mut_Color">
+           <property name="decimals">
+            <number>0</number>
            </property>
            <property name="maximum">
-            <double>1.000000000000000</double>
-           </property>
-           <property name="singleStep">
-            <double>0.100000000000000</double>
+            <double>100.000000000000000</double>
            </property>
            <property name="value">
-            <double>0.005000000000000</double>
+            <double>100.000000000000000</double>
            </property>
           </widget>
          </item>
-         <item row="6" column="0">
-          <widget class="QLabel" name="label_35">
+         <item row="53" column="1">
+          <widget class="QLabel" name="label_42">
            <property name="text">
-            <string>Keeplen</string>
+            <string>Selective mutation</string>
            </property>
           </widget>
          </item>
-         <item row="7" column="1">
-          <widget class="QDoubleSpinBox" name="S_BasicCrossProba">
+         <item row="55" column="0">
+          <widget class="QLabel" name="label_43">
+           <property name="text">
+            <string>Color</string>
+           </property>
+          </widget>
+         </item>
+         <item row="56" column="0">
+          <widget class="QLabel" name="label_44">
+           <property name="text">
+            <string>Size</string>
+           </property>
+          </widget>
+         </item>
+         <item row="57" column="1">
+          <widget class="QDoubleSpinBox" name="S_Selective_Mut_Pos">
            <property name="decimals">
-            <number>4</number>
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <double>100.000000000000000</double>
            </property>
            <property name="value">
-            <double>0.005000000000000</double>
+            <double>0.000000000000000</double>
            </property>
           </widget>
          </item>
-         <item row="7" column="0">
-          <widget class="QLabel" name="label_36">
-           <property name="text">
-            <string>Basic</string>
-           </property>
-          </widget>
-         </item>
-         <item row="8" column="1">
-          <widget class="QDoubleSpinBox" name="S_BasicCrossProbaKey">
+         <item row="56" column="1">
+          <widget class="QDoubleSpinBox" name="S_Selective_Mut_Size">
            <property name="decimals">
-            <number>4</number>
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <double>100.000000000000000</double>
            </property>
            <property name="value">
-            <double>0.005000000000000</double>
+            <double>0.000000000000000</double>
            </property>
           </widget>
          </item>
-         <item row="8" column="0">
-          <widget class="QLabel" name="label_37">
+         <item row="57" column="0">
+          <widget class="QLabel" name="label_45">
            <property name="text">
-            <string>B_key</string>
+            <string>Position</string>
            </property>
           </widget>
          </item>
-         <item row="9" column="1">
-          <widget class="QDoubleSpinBox" name="S_BasicCrossProbaValue">
+         <item row="58" column="1">
+          <widget class="QDoubleSpinBox" name="S_Selective_Mut_Text">
            <property name="decimals">
-            <number>4</number>
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <double>100.000000000000000</double>
            </property>
            <property name="value">
-            <double>0.005000000000000</double>
+            <double>0.000000000000000</double>
            </property>
           </widget>
          </item>
-         <item row="9" column="0">
-          <widget class="QLabel" name="label_38">
+         <item row="59" column="1">
+          <widget class="QDoubleSpinBox" name="S_Selective_Mut_Border">
+           <property name="decimals">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <double>100.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="58" column="0">
+          <widget class="QLabel" name="label_46">
            <property name="text">
-            <string>B_value</string>
+            <string>text</string>
+           </property>
+          </widget>
+         </item>
+         <item row="59" column="0">
+          <widget class="QLabel" name="label_47">
+           <property name="text">
+            <string>border</string>
+           </property>
+          </widget>
+         </item>
+         <item row="60" column="1">
+          <widget class="QDoubleSpinBox" name="S_Selective_Mut_Other">
+           <property name="decimals">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <double>100.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>0.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="60" column="0">
+          <widget class="QLabel" name="label_48">
+           <property name="text">
+            <string>other</string>
            </property>
           </widget>
          </item>
@@ -1134,6 +1378,24 @@ csss</string>
         <zorder>label_37</zorder>
         <zorder>S_BasicCrossProbaValue</zorder>
         <zorder>label_38</zorder>
+        <zorder>S_gaussLevel</zorder>
+        <zorder>label_39</zorder>
+        <zorder>label_40</zorder>
+        <zorder>S_gaussSigma</zorder>
+        <zorder>label_41</zorder>
+        <zorder>S_Selective_Mut_Color</zorder>
+        <zorder>label_42</zorder>
+        <zorder>label_43</zorder>
+        <zorder>label_44</zorder>
+        <zorder>S_Selective_Mut_Pos</zorder>
+        <zorder>S_Selective_Mut_Size</zorder>
+        <zorder>label_45</zorder>
+        <zorder>S_Selective_Mut_Text</zorder>
+        <zorder>S_Selective_Mut_Border</zorder>
+        <zorder>label_46</zorder>
+        <zorder>label_47</zorder>
+        <zorder>S_Selective_Mut_Other</zorder>
+        <zorder>label_48</zorder>
        </widget>
       </widget>
      </item>

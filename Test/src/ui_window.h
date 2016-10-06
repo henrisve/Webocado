@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'window.ui'
 **
-** Created: Fri Sep 16 22:58:51 2016
+** Created: Tue Oct 4 19:46:14 2016
 **      by: Qt User Interface Compiler version 4.7.4
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -92,6 +92,28 @@ public:
     QScrollArea *scrollArea;
     QWidget *scrollAreaWidgetContents;
     QFormLayout *formLayout;
+    QLabel *label_29;
+    QLabel *label_30;
+    QDoubleSpinBox *S_sizeChangeProba;
+    QLabel *label_31;
+    QDoubleSpinBox *S_swapPropa;
+    QLabel *label_6;
+    QDoubleSpinBox *S_ColorRand;
+    QLabel *label_3;
+    QDoubleSpinBox *S_ColorRot;
+    QLabel *label_32;
+    QLabel *label_35;
+    QDoubleSpinBox *S_BasicCrossKeepLengthProb;
+    QLabel *label_36;
+    QDoubleSpinBox *S_BasicCrossProba;
+    QLabel *label_37;
+    QDoubleSpinBox *S_BasicCrossProbaKey;
+    QLabel *label_38;
+    QDoubleSpinBox *S_BasicCrossProbaValue;
+    QLabel *label_33;
+    QDoubleSpinBox *S_Crossover_All;
+    QLabel *label_5;
+    QDoubleSpinBox *S_ColorCross;
     QLabel *label;
     QLabel *label_2;
     QDoubleSpinBox *S_ColorNew;
@@ -118,47 +140,43 @@ public:
     QDoubleSpinBox *S_Colorlig_F;
     QLabel *label_16;
     QDoubleSpinBox *S_Colorlig_M;
+    QLabel *label_25;
+    QLabel *label_27;
+    QDoubleSpinBox *S_Size_fitness;
+    QLabel *label_24;
+    QDoubleSpinBox *S_Size_mean;
+    QLabel *label_26;
+    QDoubleSpinBox *S_Size_std;
     QLabel *label_7;
     QLabel *label_8;
     QDoubleSpinBox *S_evolTs;
+    QLabel *label_28;
+    QDoubleSpinBox *S_evolTsize;
     QLabel *label_9;
     QDoubleSpinBox *S_TimeFitness;
+    QLabel *label_40;
+    QLabel *label_39;
+    QDoubleSpinBox *S_gaussLevel;
+    QLabel *label_41;
+    QDoubleSpinBox *S_gaussSigma;
+    QFrame *line;
+    QLabel *label_34;
     QLabel *label_22;
     QLabel *label_23;
     QDoubleSpinBox *S_PopSize;
-    QDoubleSpinBox *S_Size_mean;
-    QLabel *label_24;
-    QLabel *label_25;
-    QDoubleSpinBox *S_Size_std;
-    QLabel *label_26;
-    QDoubleSpinBox *S_Size_fitness;
-    QLabel *label_27;
-    QDoubleSpinBox *S_evolTsize;
-    QLabel *label_28;
-    QLabel *label_29;
-    QDoubleSpinBox *S_sizeChangeProba;
-    QLabel *label_30;
-    QDoubleSpinBox *S_swapPropa;
-    QLabel *label_31;
-    QLabel *label_32;
-    QDoubleSpinBox *S_Crossover_All;
-    QLabel *label_33;
-    QDoubleSpinBox *S_ColorCross;
-    QLabel *label_5;
-    QDoubleSpinBox *S_ColorRand;
-    QLabel *label_6;
-    QDoubleSpinBox *S_ColorRot;
-    QLabel *label_3;
-    QFrame *line;
-    QLabel *label_34;
-    QDoubleSpinBox *S_BasicCrossKeepLengthProb;
-    QLabel *label_35;
-    QDoubleSpinBox *S_BasicCrossProba;
-    QLabel *label_36;
-    QDoubleSpinBox *S_BasicCrossProbaKey;
-    QLabel *label_37;
-    QDoubleSpinBox *S_BasicCrossProbaValue;
-    QLabel *label_38;
+    QDoubleSpinBox *S_Selective_Mut_Color;
+    QLabel *label_42;
+    QLabel *label_43;
+    QLabel *label_44;
+    QDoubleSpinBox *S_Selective_Mut_Pos;
+    QDoubleSpinBox *S_Selective_Mut_Size;
+    QLabel *label_45;
+    QDoubleSpinBox *S_Selective_Mut_Text;
+    QDoubleSpinBox *S_Selective_Mut_Border;
+    QLabel *label_46;
+    QLabel *label_47;
+    QDoubleSpinBox *S_Selective_Mut_Other;
+    QLabel *label_48;
 
     void setupUi(QMainWindow *Window)
     {
@@ -468,9 +486,150 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 282, 1464));
+        scrollAreaWidgetContents->setGeometry(QRect(0, -525, 282, 1828));
         formLayout = new QFormLayout(scrollAreaWidgetContents);
         formLayout->setObjectName(QString::fromUtf8("formLayout"));
+        label_29 = new QLabel(scrollAreaWidgetContents);
+        label_29->setObjectName(QString::fromUtf8("label_29"));
+
+        formLayout->setWidget(0, QFormLayout::FieldRole, label_29);
+
+        label_30 = new QLabel(scrollAreaWidgetContents);
+        label_30->setObjectName(QString::fromUtf8("label_30"));
+
+        formLayout->setWidget(1, QFormLayout::LabelRole, label_30);
+
+        S_sizeChangeProba = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_sizeChangeProba->setObjectName(QString::fromUtf8("S_sizeChangeProba"));
+        S_sizeChangeProba->setDecimals(4);
+        S_sizeChangeProba->setMaximum(1);
+        S_sizeChangeProba->setValue(0.005);
+
+        formLayout->setWidget(1, QFormLayout::FieldRole, S_sizeChangeProba);
+
+        label_31 = new QLabel(scrollAreaWidgetContents);
+        label_31->setObjectName(QString::fromUtf8("label_31"));
+
+        formLayout->setWidget(2, QFormLayout::LabelRole, label_31);
+
+        S_swapPropa = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_swapPropa->setObjectName(QString::fromUtf8("S_swapPropa"));
+        S_swapPropa->setDecimals(4);
+        S_swapPropa->setMaximum(1);
+        S_swapPropa->setValue(0.005);
+
+        formLayout->setWidget(2, QFormLayout::FieldRole, S_swapPropa);
+
+        label_6 = new QLabel(scrollAreaWidgetContents);
+        label_6->setObjectName(QString::fromUtf8("label_6"));
+
+        formLayout->setWidget(3, QFormLayout::LabelRole, label_6);
+
+        S_ColorRand = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_ColorRand->setObjectName(QString::fromUtf8("S_ColorRand"));
+        S_ColorRand->setDecimals(4);
+        S_ColorRand->setMaximum(1);
+        S_ColorRand->setValue(0.025);
+
+        formLayout->setWidget(3, QFormLayout::FieldRole, S_ColorRand);
+
+        label_3 = new QLabel(scrollAreaWidgetContents);
+        label_3->setObjectName(QString::fromUtf8("label_3"));
+
+        formLayout->setWidget(4, QFormLayout::LabelRole, label_3);
+
+        S_ColorRot = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_ColorRot->setObjectName(QString::fromUtf8("S_ColorRot"));
+        S_ColorRot->setMaximum(1);
+        S_ColorRot->setValue(1);
+
+        formLayout->setWidget(4, QFormLayout::FieldRole, S_ColorRot);
+
+        label_32 = new QLabel(scrollAreaWidgetContents);
+        label_32->setObjectName(QString::fromUtf8("label_32"));
+
+        formLayout->setWidget(5, QFormLayout::FieldRole, label_32);
+
+        label_35 = new QLabel(scrollAreaWidgetContents);
+        label_35->setObjectName(QString::fromUtf8("label_35"));
+
+        formLayout->setWidget(6, QFormLayout::LabelRole, label_35);
+
+        S_BasicCrossKeepLengthProb = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_BasicCrossKeepLengthProb->setObjectName(QString::fromUtf8("S_BasicCrossKeepLengthProb"));
+        S_BasicCrossKeepLengthProb->setDecimals(4);
+        S_BasicCrossKeepLengthProb->setMaximum(1);
+        S_BasicCrossKeepLengthProb->setSingleStep(0.1);
+        S_BasicCrossKeepLengthProb->setValue(0.005);
+
+        formLayout->setWidget(6, QFormLayout::FieldRole, S_BasicCrossKeepLengthProb);
+
+        label_36 = new QLabel(scrollAreaWidgetContents);
+        label_36->setObjectName(QString::fromUtf8("label_36"));
+
+        formLayout->setWidget(7, QFormLayout::LabelRole, label_36);
+
+        S_BasicCrossProba = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_BasicCrossProba->setObjectName(QString::fromUtf8("S_BasicCrossProba"));
+        S_BasicCrossProba->setDecimals(4);
+        S_BasicCrossProba->setMaximum(1);
+        S_BasicCrossProba->setValue(0.005);
+
+        formLayout->setWidget(7, QFormLayout::FieldRole, S_BasicCrossProba);
+
+        label_37 = new QLabel(scrollAreaWidgetContents);
+        label_37->setObjectName(QString::fromUtf8("label_37"));
+
+        formLayout->setWidget(8, QFormLayout::LabelRole, label_37);
+
+        S_BasicCrossProbaKey = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_BasicCrossProbaKey->setObjectName(QString::fromUtf8("S_BasicCrossProbaKey"));
+        S_BasicCrossProbaKey->setDecimals(4);
+        S_BasicCrossProbaKey->setMaximum(1);
+        S_BasicCrossProbaKey->setValue(0.005);
+
+        formLayout->setWidget(8, QFormLayout::FieldRole, S_BasicCrossProbaKey);
+
+        label_38 = new QLabel(scrollAreaWidgetContents);
+        label_38->setObjectName(QString::fromUtf8("label_38"));
+
+        formLayout->setWidget(9, QFormLayout::LabelRole, label_38);
+
+        S_BasicCrossProbaValue = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_BasicCrossProbaValue->setObjectName(QString::fromUtf8("S_BasicCrossProbaValue"));
+        S_BasicCrossProbaValue->setDecimals(4);
+        S_BasicCrossProbaValue->setMaximum(1);
+        S_BasicCrossProbaValue->setValue(0.005);
+
+        formLayout->setWidget(9, QFormLayout::FieldRole, S_BasicCrossProbaValue);
+
+        label_33 = new QLabel(scrollAreaWidgetContents);
+        label_33->setObjectName(QString::fromUtf8("label_33"));
+
+        formLayout->setWidget(10, QFormLayout::LabelRole, label_33);
+
+        S_Crossover_All = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_Crossover_All->setObjectName(QString::fromUtf8("S_Crossover_All"));
+        S_Crossover_All->setDecimals(4);
+        S_Crossover_All->setMaximum(1);
+        S_Crossover_All->setValue(0.005);
+
+        formLayout->setWidget(10, QFormLayout::FieldRole, S_Crossover_All);
+
+        label_5 = new QLabel(scrollAreaWidgetContents);
+        label_5->setObjectName(QString::fromUtf8("label_5"));
+
+        formLayout->setWidget(11, QFormLayout::LabelRole, label_5);
+
+        S_ColorCross = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_ColorCross->setObjectName(QString::fromUtf8("S_ColorCross"));
+        S_ColorCross->setDecimals(4);
+        S_ColorCross->setMaximum(1);
+        S_ColorCross->setSingleStep(0.01);
+        S_ColorCross->setValue(0.01);
+
+        formLayout->setWidget(11, QFormLayout::FieldRole, S_ColorCross);
+
         label = new QLabel(scrollAreaWidgetContents);
         label->setObjectName(QString::fromUtf8("label"));
 
@@ -484,7 +643,9 @@ public:
         S_ColorNew = new QDoubleSpinBox(scrollAreaWidgetContents);
         S_ColorNew->setObjectName(QString::fromUtf8("S_ColorNew"));
         S_ColorNew->setDecimals(4);
-        S_ColorNew->setValue(0.005);
+        S_ColorNew->setMaximum(1);
+        S_ColorNew->setSingleStep(0.01);
+        S_ColorNew->setValue(0.01);
 
         formLayout->setWidget(13, QFormLayout::FieldRole, S_ColorNew);
 
@@ -496,7 +657,9 @@ public:
         S_ColorFlip = new QDoubleSpinBox(scrollAreaWidgetContents);
         S_ColorFlip->setObjectName(QString::fromUtf8("S_ColorFlip"));
         S_ColorFlip->setDecimals(4);
-        S_ColorFlip->setValue(0.002);
+        S_ColorFlip->setMaximum(1);
+        S_ColorFlip->setSingleStep(0.01);
+        S_ColorFlip->setValue(0.01);
 
         formLayout->setWidget(15, QFormLayout::FieldRole, S_ColorFlip);
 
@@ -608,6 +771,49 @@ public:
 
         formLayout->setWidget(40, QFormLayout::FieldRole, S_Colorlig_M);
 
+        label_25 = new QLabel(scrollAreaWidgetContents);
+        label_25->setObjectName(QString::fromUtf8("label_25"));
+
+        formLayout->setWidget(43, QFormLayout::FieldRole, label_25);
+
+        label_27 = new QLabel(scrollAreaWidgetContents);
+        label_27->setObjectName(QString::fromUtf8("label_27"));
+
+        formLayout->setWidget(44, QFormLayout::LabelRole, label_27);
+
+        S_Size_fitness = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_Size_fitness->setObjectName(QString::fromUtf8("S_Size_fitness"));
+        S_Size_fitness->setDecimals(2);
+        S_Size_fitness->setMinimum(-100);
+        S_Size_fitness->setMaximum(100);
+        S_Size_fitness->setSingleStep(0.1);
+
+        formLayout->setWidget(44, QFormLayout::FieldRole, S_Size_fitness);
+
+        label_24 = new QLabel(scrollAreaWidgetContents);
+        label_24->setObjectName(QString::fromUtf8("label_24"));
+
+        formLayout->setWidget(45, QFormLayout::LabelRole, label_24);
+
+        S_Size_mean = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_Size_mean->setObjectName(QString::fromUtf8("S_Size_mean"));
+        S_Size_mean->setDecimals(1);
+        S_Size_mean->setMinimum(-100);
+
+        formLayout->setWidget(45, QFormLayout::FieldRole, S_Size_mean);
+
+        label_26 = new QLabel(scrollAreaWidgetContents);
+        label_26->setObjectName(QString::fromUtf8("label_26"));
+
+        formLayout->setWidget(46, QFormLayout::LabelRole, label_26);
+
+        S_Size_std = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_Size_std->setObjectName(QString::fromUtf8("S_Size_std"));
+        S_Size_std->setDecimals(1);
+        S_Size_std->setValue(5);
+
+        formLayout->setWidget(46, QFormLayout::FieldRole, S_Size_std);
+
         label_7 = new QLabel(scrollAreaWidgetContents);
         label_7->setObjectName(QString::fromUtf8("label_7"));
 
@@ -620,81 +826,16 @@ public:
 
         S_evolTs = new QDoubleSpinBox(scrollAreaWidgetContents);
         S_evolTs->setObjectName(QString::fromUtf8("S_evolTs"));
+        S_evolTs->setMaximum(1);
+        S_evolTs->setSingleStep(0.05);
         S_evolTs->setValue(0.7);
 
         formLayout->setWidget(49, QFormLayout::FieldRole, S_evolTs);
 
-        label_9 = new QLabel(scrollAreaWidgetContents);
-        label_9->setObjectName(QString::fromUtf8("label_9"));
+        label_28 = new QLabel(scrollAreaWidgetContents);
+        label_28->setObjectName(QString::fromUtf8("label_28"));
 
-        formLayout->setWidget(51, QFormLayout::LabelRole, label_9);
-
-        S_TimeFitness = new QDoubleSpinBox(scrollAreaWidgetContents);
-        S_TimeFitness->setObjectName(QString::fromUtf8("S_TimeFitness"));
-        S_TimeFitness->setMaximum(2000);
-        S_TimeFitness->setValue(2000);
-
-        formLayout->setWidget(51, QFormLayout::FieldRole, S_TimeFitness);
-
-        label_22 = new QLabel(scrollAreaWidgetContents);
-        label_22->setObjectName(QString::fromUtf8("label_22"));
-
-        formLayout->setWidget(56, QFormLayout::FieldRole, label_22);
-
-        label_23 = new QLabel(scrollAreaWidgetContents);
-        label_23->setObjectName(QString::fromUtf8("label_23"));
-
-        formLayout->setWidget(57, QFormLayout::LabelRole, label_23);
-
-        S_PopSize = new QDoubleSpinBox(scrollAreaWidgetContents);
-        S_PopSize->setObjectName(QString::fromUtf8("S_PopSize"));
-        S_PopSize->setDecimals(0);
-        S_PopSize->setMinimum(2);
-        S_PopSize->setValue(5);
-
-        formLayout->setWidget(57, QFormLayout::FieldRole, S_PopSize);
-
-        S_Size_mean = new QDoubleSpinBox(scrollAreaWidgetContents);
-        S_Size_mean->setObjectName(QString::fromUtf8("S_Size_mean"));
-        S_Size_mean->setDecimals(1);
-        S_Size_mean->setMinimum(-100);
-
-        formLayout->setWidget(45, QFormLayout::FieldRole, S_Size_mean);
-
-        label_24 = new QLabel(scrollAreaWidgetContents);
-        label_24->setObjectName(QString::fromUtf8("label_24"));
-
-        formLayout->setWidget(45, QFormLayout::LabelRole, label_24);
-
-        label_25 = new QLabel(scrollAreaWidgetContents);
-        label_25->setObjectName(QString::fromUtf8("label_25"));
-
-        formLayout->setWidget(43, QFormLayout::FieldRole, label_25);
-
-        S_Size_std = new QDoubleSpinBox(scrollAreaWidgetContents);
-        S_Size_std->setObjectName(QString::fromUtf8("S_Size_std"));
-        S_Size_std->setDecimals(1);
-        S_Size_std->setValue(5);
-
-        formLayout->setWidget(46, QFormLayout::FieldRole, S_Size_std);
-
-        label_26 = new QLabel(scrollAreaWidgetContents);
-        label_26->setObjectName(QString::fromUtf8("label_26"));
-
-        formLayout->setWidget(46, QFormLayout::LabelRole, label_26);
-
-        S_Size_fitness = new QDoubleSpinBox(scrollAreaWidgetContents);
-        S_Size_fitness->setObjectName(QString::fromUtf8("S_Size_fitness"));
-        S_Size_fitness->setDecimals(4);
-        S_Size_fitness->setMinimum(-100);
-        S_Size_fitness->setMaximum(100);
-
-        formLayout->setWidget(44, QFormLayout::FieldRole, S_Size_fitness);
-
-        label_27 = new QLabel(scrollAreaWidgetContents);
-        label_27->setObjectName(QString::fromUtf8("label_27"));
-
-        formLayout->setWidget(44, QFormLayout::LabelRole, label_27);
+        formLayout->setWidget(50, QFormLayout::LabelRole, label_28);
 
         S_evolTsize = new QDoubleSpinBox(scrollAreaWidgetContents);
         S_evolTsize->setObjectName(QString::fromUtf8("S_evolTsize"));
@@ -704,151 +845,165 @@ public:
 
         formLayout->setWidget(50, QFormLayout::FieldRole, S_evolTsize);
 
-        label_28 = new QLabel(scrollAreaWidgetContents);
-        label_28->setObjectName(QString::fromUtf8("label_28"));
+        label_9 = new QLabel(scrollAreaWidgetContents);
+        label_9->setObjectName(QString::fromUtf8("label_9"));
 
-        formLayout->setWidget(50, QFormLayout::LabelRole, label_28);
+        formLayout->setWidget(51, QFormLayout::LabelRole, label_9);
 
-        label_29 = new QLabel(scrollAreaWidgetContents);
-        label_29->setObjectName(QString::fromUtf8("label_29"));
+        S_TimeFitness = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_TimeFitness->setObjectName(QString::fromUtf8("S_TimeFitness"));
+        S_TimeFitness->setDecimals(0);
+        S_TimeFitness->setMinimum(100);
+        S_TimeFitness->setMaximum(120000);
+        S_TimeFitness->setSingleStep(100);
+        S_TimeFitness->setValue(2000);
 
-        formLayout->setWidget(0, QFormLayout::FieldRole, label_29);
+        formLayout->setWidget(51, QFormLayout::FieldRole, S_TimeFitness);
 
-        S_sizeChangeProba = new QDoubleSpinBox(scrollAreaWidgetContents);
-        S_sizeChangeProba->setObjectName(QString::fromUtf8("S_sizeChangeProba"));
-        S_sizeChangeProba->setDecimals(4);
-        S_sizeChangeProba->setValue(0.005);
+        label_40 = new QLabel(scrollAreaWidgetContents);
+        label_40->setObjectName(QString::fromUtf8("label_40"));
 
-        formLayout->setWidget(1, QFormLayout::FieldRole, S_sizeChangeProba);
+        formLayout->setWidget(61, QFormLayout::FieldRole, label_40);
 
-        label_30 = new QLabel(scrollAreaWidgetContents);
-        label_30->setObjectName(QString::fromUtf8("label_30"));
+        label_39 = new QLabel(scrollAreaWidgetContents);
+        label_39->setObjectName(QString::fromUtf8("label_39"));
 
-        formLayout->setWidget(1, QFormLayout::LabelRole, label_30);
+        formLayout->setWidget(62, QFormLayout::LabelRole, label_39);
 
-        S_swapPropa = new QDoubleSpinBox(scrollAreaWidgetContents);
-        S_swapPropa->setObjectName(QString::fromUtf8("S_swapPropa"));
-        S_swapPropa->setDecimals(4);
-        S_swapPropa->setValue(0.005);
+        S_gaussLevel = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_gaussLevel->setObjectName(QString::fromUtf8("S_gaussLevel"));
+        S_gaussLevel->setDecimals(0);
+        S_gaussLevel->setMaximum(100);
+        S_gaussLevel->setValue(0);
 
-        formLayout->setWidget(2, QFormLayout::FieldRole, S_swapPropa);
+        formLayout->setWidget(62, QFormLayout::FieldRole, S_gaussLevel);
 
-        label_31 = new QLabel(scrollAreaWidgetContents);
-        label_31->setObjectName(QString::fromUtf8("label_31"));
+        label_41 = new QLabel(scrollAreaWidgetContents);
+        label_41->setObjectName(QString::fromUtf8("label_41"));
 
-        formLayout->setWidget(2, QFormLayout::LabelRole, label_31);
+        formLayout->setWidget(63, QFormLayout::LabelRole, label_41);
 
-        label_32 = new QLabel(scrollAreaWidgetContents);
-        label_32->setObjectName(QString::fromUtf8("label_32"));
+        S_gaussSigma = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_gaussSigma->setObjectName(QString::fromUtf8("S_gaussSigma"));
+        S_gaussSigma->setDecimals(1);
+        S_gaussSigma->setMaximum(100);
+        S_gaussSigma->setSingleStep(1);
+        S_gaussSigma->setValue(1);
 
-        formLayout->setWidget(5, QFormLayout::FieldRole, label_32);
-
-        S_Crossover_All = new QDoubleSpinBox(scrollAreaWidgetContents);
-        S_Crossover_All->setObjectName(QString::fromUtf8("S_Crossover_All"));
-        S_Crossover_All->setDecimals(4);
-        S_Crossover_All->setValue(0.005);
-
-        formLayout->setWidget(10, QFormLayout::FieldRole, S_Crossover_All);
-
-        label_33 = new QLabel(scrollAreaWidgetContents);
-        label_33->setObjectName(QString::fromUtf8("label_33"));
-
-        formLayout->setWidget(10, QFormLayout::LabelRole, label_33);
-
-        S_ColorCross = new QDoubleSpinBox(scrollAreaWidgetContents);
-        S_ColorCross->setObjectName(QString::fromUtf8("S_ColorCross"));
-
-        formLayout->setWidget(11, QFormLayout::FieldRole, S_ColorCross);
-
-        label_5 = new QLabel(scrollAreaWidgetContents);
-        label_5->setObjectName(QString::fromUtf8("label_5"));
-
-        formLayout->setWidget(11, QFormLayout::LabelRole, label_5);
-
-        S_ColorRand = new QDoubleSpinBox(scrollAreaWidgetContents);
-        S_ColorRand->setObjectName(QString::fromUtf8("S_ColorRand"));
-        S_ColorRand->setDecimals(4);
-        S_ColorRand->setValue(0.025);
-
-        formLayout->setWidget(3, QFormLayout::FieldRole, S_ColorRand);
-
-        label_6 = new QLabel(scrollAreaWidgetContents);
-        label_6->setObjectName(QString::fromUtf8("label_6"));
-
-        formLayout->setWidget(3, QFormLayout::LabelRole, label_6);
-
-        S_ColorRot = new QDoubleSpinBox(scrollAreaWidgetContents);
-        S_ColorRot->setObjectName(QString::fromUtf8("S_ColorRot"));
-        S_ColorRot->setValue(1);
-
-        formLayout->setWidget(4, QFormLayout::FieldRole, S_ColorRot);
-
-        label_3 = new QLabel(scrollAreaWidgetContents);
-        label_3->setObjectName(QString::fromUtf8("label_3"));
-
-        formLayout->setWidget(4, QFormLayout::LabelRole, label_3);
+        formLayout->setWidget(63, QFormLayout::FieldRole, S_gaussSigma);
 
         line = new QFrame(scrollAreaWidgetContents);
         line->setObjectName(QString::fromUtf8("line"));
         line->setFrameShape(QFrame::HLine);
         line->setFrameShadow(QFrame::Sunken);
 
-        formLayout->setWidget(54, QFormLayout::FieldRole, line);
+        formLayout->setWidget(64, QFormLayout::FieldRole, line);
 
         label_34 = new QLabel(scrollAreaWidgetContents);
         label_34->setObjectName(QString::fromUtf8("label_34"));
 
-        formLayout->setWidget(55, QFormLayout::FieldRole, label_34);
+        formLayout->setWidget(66, QFormLayout::FieldRole, label_34);
 
-        S_BasicCrossKeepLengthProb = new QDoubleSpinBox(scrollAreaWidgetContents);
-        S_BasicCrossKeepLengthProb->setObjectName(QString::fromUtf8("S_BasicCrossKeepLengthProb"));
-        S_BasicCrossKeepLengthProb->setDecimals(4);
-        S_BasicCrossKeepLengthProb->setMaximum(1);
-        S_BasicCrossKeepLengthProb->setSingleStep(0.1);
-        S_BasicCrossKeepLengthProb->setValue(0.005);
+        label_22 = new QLabel(scrollAreaWidgetContents);
+        label_22->setObjectName(QString::fromUtf8("label_22"));
 
-        formLayout->setWidget(6, QFormLayout::FieldRole, S_BasicCrossKeepLengthProb);
+        formLayout->setWidget(68, QFormLayout::FieldRole, label_22);
 
-        label_35 = new QLabel(scrollAreaWidgetContents);
-        label_35->setObjectName(QString::fromUtf8("label_35"));
+        label_23 = new QLabel(scrollAreaWidgetContents);
+        label_23->setObjectName(QString::fromUtf8("label_23"));
 
-        formLayout->setWidget(6, QFormLayout::LabelRole, label_35);
+        formLayout->setWidget(69, QFormLayout::LabelRole, label_23);
 
-        S_BasicCrossProba = new QDoubleSpinBox(scrollAreaWidgetContents);
-        S_BasicCrossProba->setObjectName(QString::fromUtf8("S_BasicCrossProba"));
-        S_BasicCrossProba->setDecimals(4);
-        S_BasicCrossProba->setValue(0.005);
+        S_PopSize = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_PopSize->setObjectName(QString::fromUtf8("S_PopSize"));
+        S_PopSize->setDecimals(0);
+        S_PopSize->setMinimum(2);
+        S_PopSize->setValue(5);
 
-        formLayout->setWidget(7, QFormLayout::FieldRole, S_BasicCrossProba);
+        formLayout->setWidget(69, QFormLayout::FieldRole, S_PopSize);
 
-        label_36 = new QLabel(scrollAreaWidgetContents);
-        label_36->setObjectName(QString::fromUtf8("label_36"));
+        S_Selective_Mut_Color = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_Selective_Mut_Color->setObjectName(QString::fromUtf8("S_Selective_Mut_Color"));
+        S_Selective_Mut_Color->setDecimals(0);
+        S_Selective_Mut_Color->setMaximum(100);
+        S_Selective_Mut_Color->setValue(100);
 
-        formLayout->setWidget(7, QFormLayout::LabelRole, label_36);
+        formLayout->setWidget(55, QFormLayout::FieldRole, S_Selective_Mut_Color);
 
-        S_BasicCrossProbaKey = new QDoubleSpinBox(scrollAreaWidgetContents);
-        S_BasicCrossProbaKey->setObjectName(QString::fromUtf8("S_BasicCrossProbaKey"));
-        S_BasicCrossProbaKey->setDecimals(4);
-        S_BasicCrossProbaKey->setValue(0.005);
+        label_42 = new QLabel(scrollAreaWidgetContents);
+        label_42->setObjectName(QString::fromUtf8("label_42"));
 
-        formLayout->setWidget(8, QFormLayout::FieldRole, S_BasicCrossProbaKey);
+        formLayout->setWidget(53, QFormLayout::FieldRole, label_42);
 
-        label_37 = new QLabel(scrollAreaWidgetContents);
-        label_37->setObjectName(QString::fromUtf8("label_37"));
+        label_43 = new QLabel(scrollAreaWidgetContents);
+        label_43->setObjectName(QString::fromUtf8("label_43"));
 
-        formLayout->setWidget(8, QFormLayout::LabelRole, label_37);
+        formLayout->setWidget(55, QFormLayout::LabelRole, label_43);
 
-        S_BasicCrossProbaValue = new QDoubleSpinBox(scrollAreaWidgetContents);
-        S_BasicCrossProbaValue->setObjectName(QString::fromUtf8("S_BasicCrossProbaValue"));
-        S_BasicCrossProbaValue->setDecimals(4);
-        S_BasicCrossProbaValue->setValue(0.005);
+        label_44 = new QLabel(scrollAreaWidgetContents);
+        label_44->setObjectName(QString::fromUtf8("label_44"));
 
-        formLayout->setWidget(9, QFormLayout::FieldRole, S_BasicCrossProbaValue);
+        formLayout->setWidget(56, QFormLayout::LabelRole, label_44);
 
-        label_38 = new QLabel(scrollAreaWidgetContents);
-        label_38->setObjectName(QString::fromUtf8("label_38"));
+        S_Selective_Mut_Pos = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_Selective_Mut_Pos->setObjectName(QString::fromUtf8("S_Selective_Mut_Pos"));
+        S_Selective_Mut_Pos->setDecimals(0);
+        S_Selective_Mut_Pos->setMaximum(100);
+        S_Selective_Mut_Pos->setValue(0);
 
-        formLayout->setWidget(9, QFormLayout::LabelRole, label_38);
+        formLayout->setWidget(57, QFormLayout::FieldRole, S_Selective_Mut_Pos);
+
+        S_Selective_Mut_Size = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_Selective_Mut_Size->setObjectName(QString::fromUtf8("S_Selective_Mut_Size"));
+        S_Selective_Mut_Size->setDecimals(0);
+        S_Selective_Mut_Size->setMaximum(100);
+        S_Selective_Mut_Size->setValue(0);
+
+        formLayout->setWidget(56, QFormLayout::FieldRole, S_Selective_Mut_Size);
+
+        label_45 = new QLabel(scrollAreaWidgetContents);
+        label_45->setObjectName(QString::fromUtf8("label_45"));
+
+        formLayout->setWidget(57, QFormLayout::LabelRole, label_45);
+
+        S_Selective_Mut_Text = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_Selective_Mut_Text->setObjectName(QString::fromUtf8("S_Selective_Mut_Text"));
+        S_Selective_Mut_Text->setDecimals(0);
+        S_Selective_Mut_Text->setMaximum(100);
+        S_Selective_Mut_Text->setValue(0);
+
+        formLayout->setWidget(58, QFormLayout::FieldRole, S_Selective_Mut_Text);
+
+        S_Selective_Mut_Border = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_Selective_Mut_Border->setObjectName(QString::fromUtf8("S_Selective_Mut_Border"));
+        S_Selective_Mut_Border->setDecimals(0);
+        S_Selective_Mut_Border->setMaximum(100);
+        S_Selective_Mut_Border->setValue(0);
+
+        formLayout->setWidget(59, QFormLayout::FieldRole, S_Selective_Mut_Border);
+
+        label_46 = new QLabel(scrollAreaWidgetContents);
+        label_46->setObjectName(QString::fromUtf8("label_46"));
+
+        formLayout->setWidget(58, QFormLayout::LabelRole, label_46);
+
+        label_47 = new QLabel(scrollAreaWidgetContents);
+        label_47->setObjectName(QString::fromUtf8("label_47"));
+
+        formLayout->setWidget(59, QFormLayout::LabelRole, label_47);
+
+        S_Selective_Mut_Other = new QDoubleSpinBox(scrollAreaWidgetContents);
+        S_Selective_Mut_Other->setObjectName(QString::fromUtf8("S_Selective_Mut_Other"));
+        S_Selective_Mut_Other->setDecimals(0);
+        S_Selective_Mut_Other->setMaximum(100);
+        S_Selective_Mut_Other->setValue(0);
+
+        formLayout->setWidget(60, QFormLayout::FieldRole, S_Selective_Mut_Other);
+
+        label_48 = new QLabel(scrollAreaWidgetContents);
+        label_48->setObjectName(QString::fromUtf8("label_48"));
+
+        formLayout->setWidget(60, QFormLayout::LabelRole, label_48);
 
         scrollArea->setWidget(scrollAreaWidgetContents);
         label->raise();
@@ -918,6 +1073,24 @@ public:
         label_37->raise();
         S_BasicCrossProbaValue->raise();
         label_38->raise();
+        S_gaussLevel->raise();
+        label_39->raise();
+        label_40->raise();
+        S_gaussSigma->raise();
+        label_41->raise();
+        S_Selective_Mut_Color->raise();
+        label_42->raise();
+        label_43->raise();
+        label_44->raise();
+        S_Selective_Mut_Pos->raise();
+        S_Selective_Mut_Size->raise();
+        label_45->raise();
+        S_Selective_Mut_Text->raise();
+        S_Selective_Mut_Border->raise();
+        label_46->raise();
+        label_47->raise();
+        S_Selective_Mut_Other->raise();
+        label_48->raise();
 
         verticalLayout_2->addWidget(scrollArea);
 
@@ -946,7 +1119,7 @@ public:
 
         tabWidget_Sor9->setCurrentIndex(0);
         tabWidget_WeborHtml->setCurrentIndex(0);
-        tabWidget_BorS->setCurrentIndex(1);
+        tabWidget_BorS->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(Window);
@@ -997,9 +1170,21 @@ public:
         ___qtablewidgetitem13->setText(QApplication::translate("Window", "p5", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem14 = ColorTable->verticalHeaderItem(4);
         ___qtablewidgetitem14->setText(QApplication::translate("Window", "p5", 0, QApplication::UnicodeUTF8));
-        webURLs->setPlainText(QApplication::translate("Window", "csss\n"
-"csss", 0, QApplication::UnicodeUTF8));
+        webURLs->setPlainText(QApplication::translate("Window", "csssm\n"
+"csstm", 0, QApplication::UnicodeUTF8));
         pushButton->setText(QApplication::translate("Window", "Segment Page", 0, QApplication::UnicodeUTF8));
+        label_29->setText(QApplication::translate("Window", "Proba mutation", 0, QApplication::UnicodeUTF8));
+        label_30->setText(QApplication::translate("Window", "size", 0, QApplication::UnicodeUTF8));
+        label_31->setText(QApplication::translate("Window", "swap", 0, QApplication::UnicodeUTF8));
+        label_6->setText(QApplication::translate("Window", "RndCol", 0, QApplication::UnicodeUTF8));
+        label_3->setText(QApplication::translate("Window", "RotCol", 0, QApplication::UnicodeUTF8));
+        label_32->setText(QApplication::translate("Window", "Proba Crossover", 0, QApplication::UnicodeUTF8));
+        label_35->setText(QApplication::translate("Window", "Keeplen", 0, QApplication::UnicodeUTF8));
+        label_36->setText(QApplication::translate("Window", "Basic", 0, QApplication::UnicodeUTF8));
+        label_37->setText(QApplication::translate("Window", "B_key", 0, QApplication::UnicodeUTF8));
+        label_38->setText(QApplication::translate("Window", "B_value", 0, QApplication::UnicodeUTF8));
+        label_33->setText(QApplication::translate("Window", "aa", 0, QApplication::UnicodeUTF8));
+        label_5->setText(QApplication::translate("Window", "Color", 0, QApplication::UnicodeUTF8));
         label->setText(QApplication::translate("Window", "Proba Colors", 0, QApplication::UnicodeUTF8));
         label_2->setText(QApplication::translate("Window", "p-New", 0, QApplication::UnicodeUTF8));
         label_4->setText(QApplication::translate("Window", "p-Flip", 0, QApplication::UnicodeUTF8));
@@ -1015,29 +1200,27 @@ public:
         label_18->setText(QApplication::translate("Window", "C-lig R", 0, QApplication::UnicodeUTF8));
         label_17->setText(QApplication::translate("Window", "C-lig F", 0, QApplication::UnicodeUTF8));
         label_16->setText(QApplication::translate("Window", "C-lig M", 0, QApplication::UnicodeUTF8));
+        label_25->setText(QApplication::translate("Window", "Mutation of Size", 0, QApplication::UnicodeUTF8));
+        label_27->setText(QApplication::translate("Window", "F", 0, QApplication::UnicodeUTF8));
+        label_24->setText(QApplication::translate("Window", "Mean", 0, QApplication::UnicodeUTF8));
+        label_26->setText(QApplication::translate("Window", "std", 0, QApplication::UnicodeUTF8));
         label_7->setText(QApplication::translate("Window", "Evolution", 0, QApplication::UnicodeUTF8));
         label_8->setText(QApplication::translate("Window", "T-prop", 0, QApplication::UnicodeUTF8));
+        label_28->setText(QApplication::translate("Window", "T-Size", 0, QApplication::UnicodeUTF8));
         label_9->setText(QApplication::translate("Window", "htime(ms)", 0, QApplication::UnicodeUTF8));
+        label_40->setText(QApplication::translate("Window", "Gauss tree Level", 0, QApplication::UnicodeUTF8));
+        label_39->setText(QApplication::translate("Window", "Level", 0, QApplication::UnicodeUTF8));
+        label_41->setText(QApplication::translate("Window", "Sigma", 0, QApplication::UnicodeUTF8));
+        label_34->setText(QApplication::translate("Window", "Before Start:", 0, QApplication::UnicodeUTF8));
         label_22->setText(QApplication::translate("Window", "Population", 0, QApplication::UnicodeUTF8));
         label_23->setText(QApplication::translate("Window", "\"size\"", 0, QApplication::UnicodeUTF8));
-        label_24->setText(QApplication::translate("Window", "Mean", 0, QApplication::UnicodeUTF8));
-        label_25->setText(QApplication::translate("Window", "Mutation of Size", 0, QApplication::UnicodeUTF8));
-        label_26->setText(QApplication::translate("Window", "std", 0, QApplication::UnicodeUTF8));
-        label_27->setText(QApplication::translate("Window", "F", 0, QApplication::UnicodeUTF8));
-        label_28->setText(QApplication::translate("Window", "T-Size", 0, QApplication::UnicodeUTF8));
-        label_29->setText(QApplication::translate("Window", "Proba mutation", 0, QApplication::UnicodeUTF8));
-        label_30->setText(QApplication::translate("Window", "size", 0, QApplication::UnicodeUTF8));
-        label_31->setText(QApplication::translate("Window", "swap", 0, QApplication::UnicodeUTF8));
-        label_32->setText(QApplication::translate("Window", "Proba Crossover", 0, QApplication::UnicodeUTF8));
-        label_33->setText(QApplication::translate("Window", "aa", 0, QApplication::UnicodeUTF8));
-        label_5->setText(QApplication::translate("Window", "Color", 0, QApplication::UnicodeUTF8));
-        label_6->setText(QApplication::translate("Window", "RndCol", 0, QApplication::UnicodeUTF8));
-        label_3->setText(QApplication::translate("Window", "RotCol", 0, QApplication::UnicodeUTF8));
-        label_34->setText(QApplication::translate("Window", "Before Start:", 0, QApplication::UnicodeUTF8));
-        label_35->setText(QApplication::translate("Window", "Keeplen", 0, QApplication::UnicodeUTF8));
-        label_36->setText(QApplication::translate("Window", "Basic", 0, QApplication::UnicodeUTF8));
-        label_37->setText(QApplication::translate("Window", "B_key", 0, QApplication::UnicodeUTF8));
-        label_38->setText(QApplication::translate("Window", "B_value", 0, QApplication::UnicodeUTF8));
+        label_42->setText(QApplication::translate("Window", "Selective mutation", 0, QApplication::UnicodeUTF8));
+        label_43->setText(QApplication::translate("Window", "Color", 0, QApplication::UnicodeUTF8));
+        label_44->setText(QApplication::translate("Window", "Size", 0, QApplication::UnicodeUTF8));
+        label_45->setText(QApplication::translate("Window", "Position", 0, QApplication::UnicodeUTF8));
+        label_46->setText(QApplication::translate("Window", "text", 0, QApplication::UnicodeUTF8));
+        label_47->setText(QApplication::translate("Window", "border", 0, QApplication::UnicodeUTF8));
+        label_48->setText(QApplication::translate("Window", "other", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

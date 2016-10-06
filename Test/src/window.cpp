@@ -44,7 +44,7 @@ void Window::on_pushButton_clicked(){
             return;
         }
     }
-    if(tab_nine->isVisible() && webURLlist.size()<9){
+    if(tab_nine->isVisible() && S_PopSize->value()<9){
         QMessageBox msgBox;
         msgBox.setText("Population should be atleast 9 for \"3x3-mode\"");
         msgBox.setInformativeText("Do you want to abort or continue with normal mode?");
@@ -77,11 +77,7 @@ void Window::on_pushButton_clicked(){
         }else{
             webURLlist[i]=("http://www." + temp);
         }
-
     }
-
-
-
 
 
     managerVector.append(new QNetworkAccessManager(this));
@@ -236,7 +232,7 @@ void Window::on_timer_finished() {
     igaObject->initIgacado(&settings,&numericLimits,S_PopSize->value(),&population);
     qDebug() << "Done, mutate first generation" << endl;
     popUpdateColor();
-    igaObject->mutateColor();
+    igaObject->mutate();
     qDebug() << "Done, create style lists" << endl;
 
     //in some cases we need to do this?
@@ -317,10 +313,10 @@ void Window::examineChildElements(const BentoBlock* bentoBlock, QTreeWidgetItem*
 // main mcolor all the ones under change too
 //#####################################################################
 void Window::popBuildColorList() {
-    for(int i=0;i<population.size()/2;i++){
+    for(int i=0;i<population.size()/2;i++){ //change to popsize
         population[i].updateStyleList();
         buildColorList(&population[i]);
-
+        //QList<QString> keys = population[i].ComputedStyleList.keys();
     }
 }
 void Window::buildColorList(Page *mPage) {
@@ -475,28 +471,31 @@ void bricolage::Window::on_button_like_clicked(){
 }
 
 void Window::button_vote(bool liked){
-    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+
+
     qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
     mainWeb_1->setPage(nineNumberPage[0]);
     setEnabled(false);
-
+    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
     qDebug()<<"new Vote! Time" << myTimer.elapsed() << endl;
     double fitness = (1+exp(-double(myTimer.elapsed())/S_TimeFitness->value()));
     fitness = liked ? fitness/2 : (1/fitness)-0.5;
     igaObject->nextIndividual(fitness);
     //mainTabWidget->setCurrentIndex(igaObject->currIndividial);
-    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+
 
     if(igaObject->currIndividial==0){
-        qDebug() << "new gen update colors:" << endl;
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+                int t=myTimer.elapsed();
+        //qDebug() << "new gen update colors:" << endl << myTimer.elapsed()-t;
         popUpdateColor();
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+                //qDebug() << "popUpdateColor();" << endl << myTimer.elapsed()-t;
         popBuildColorList();
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+                //qDebug() << "popBuildColorList()" << endl << myTimer.elapsed()-t;
         updateColorTable();
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+                //qDebug() << "updateColorTable();" << endl << myTimer.elapsed()-t;
     }
+
+    //adds visible text of the stylelist to gui
     StyleListTextboxOld->clear();
     StyleListTextboxOld->insertPlainText(StyleListTextbox->toPlainText());
     StyleListTextbox->clear();
@@ -507,16 +506,16 @@ void Window::button_vote(bool liked){
             StyleListTextbox->appendPlainText(val);
         }
     }
-    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+
     mainWeb_1->setPage(population[igaObject->currIndividial].webpageP);
-    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+
 
 
     qDebug() << "Done, your turn!" << endl;
 
     myTimer.start();
     //
-    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+
     htmlView->document()->setPlainText(population[igaObject->currIndividial].getHtml());
     treeWidget->clear();
     examineChildElements(population[igaObject->currIndividial].mBentoTree->mRootBlock, treeWidget->invisibleRootItem());
@@ -525,12 +524,13 @@ void Window::button_vote(bool liked){
 
     //Start timer for next round
 
-    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+
     qApp->restoreOverrideCursor();
     setEnabled(true);
+    qDebug() << "V3" << "p0:" << population[0].ComputedStyleList["height"].size() << "p1:" << population[1].ComputedStyleList["height"].size()<<endl;
     QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
 }
-
+ //Todo, very slow!!
 void Window::updateColorTable(){
     int pSize=igaObject->popSize();
     ColorTable->clear();
@@ -779,6 +779,15 @@ void Window::init(){
     settings.insert("S_BasicCrossProbaKey",S_BasicCrossProbaKey);
     settings.insert("S_BasicCrossProbaValue",S_BasicCrossProbaValue);
     settings.insert("S_BasicCrossKeepLengthProb",S_BasicCrossKeepLengthProb);
+    settings.insert("S_gaussLevel",S_gaussLevel);
+    settings.insert("S_gaussSigma",S_gaussSigma);
+    settings.insert("S_Selective_Mut_Color",S_Selective_Mut_Color);
+    settings.insert("S_Selective_Mut_Size",S_Selective_Mut_Size);
+    settings.insert("S_Selective_Mut_Pos",S_Selective_Mut_Pos);
+    settings.insert("S_Selective_Mut_Text",S_Selective_Mut_Text);
+    settings.insert("S_Selective_Mut_Border",S_Selective_Mut_Border);
+    settings.insert("S_Selective_Mut_Other",S_Selective_Mut_Other);
+
 }
 bool Window::saveToIni(){
     QFile file("webocado.ini");
