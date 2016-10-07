@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>assets/jquery.js</file>
+        <file>assets/preprocess.js</file>
+
+    </qresource>
+</RCC>
