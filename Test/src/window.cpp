@@ -55,13 +55,24 @@ void Window::on_pushButton_clicked(){
             return;
         }
     }
-
+    if(!managerVector.isEmpty()){
+        QMessageBox msgBox;
+        msgBox.setText("cancel current run and start again?");
+        msgBox.setInformativeText("Do you want to abort or continue?");
+        msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Abort);
+        if(msgBox.exec()==QMessageBox::Abort){
+            qApp->restoreOverrideCursor();
+            setEnabled(true);
+            return;
+        }
+    }
     treeWidget->clear();
     treeWidget2->clear();
     managerVector.clear();
     webPageVector.clear();    //clear so if used before we start fresh.
     pageId.clear();
     isButtonClicked=true;
+
 
 
 
@@ -257,15 +268,6 @@ void Window::on_timer_finished() {
         Web9_8->installEventFilter(this);
         Web9_9->installEventFilter(this);
 
-//        Web9_1->setZoomFactor(0.5);
-//        Web9_2->setZoomFactor(0.5);
-//        Web9_3->setZoomFactor(0.5);
-//        Web9_4->setZoomFactor(0.5);
-//        Web9_5->setZoomFactor(0.5);
-//        Web9_6->setZoomFactor(0.5);
-//        Web9_7->setZoomFactor(0.5);
-//        Web9_8->setZoomFactor(0.5);
-//        Web9_9->setZoomFactor(0.5);
 
         for(int i=0;i<9;i++){
             nineNumberPage.append(new QWebPage);
@@ -577,6 +579,8 @@ bool Window::eventFilter(QObject *object, QEvent *event){
         Web9_1->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_1->setPage(nineNumberPage[nineCounter]);
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+        Web9_1->setZoomFactor(1);
         nineNewClick(nineList[0]);
     }
     if (object == Web9_2 && event->type() == QEvent::MouseButtonPress) {
@@ -585,6 +589,8 @@ bool Window::eventFilter(QObject *object, QEvent *event){
         Web9_2->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_2->setPage(nineNumberPage[nineCounter]);
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+        Web9_2->setZoomFactor(1);
         nineNewClick(nineList[1]);
     }
     if (object == Web9_3 && event->type() == QEvent::MouseButtonPress) {
@@ -593,6 +599,8 @@ bool Window::eventFilter(QObject *object, QEvent *event){
         Web9_3->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_3->setPage(nineNumberPage[nineCounter]);
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+        Web9_3->setZoomFactor(1);
         nineNewClick(nineList[2]);
     }
     if (object == Web9_4 && event->type() == QEvent::MouseButtonPress) {
@@ -600,7 +608,9 @@ bool Window::eventFilter(QObject *object, QEvent *event){
         qDebug()<<"woop4";
         Web9_4->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        Web9_4->setPage(nineNumberPage[nineCounter]);       
+        Web9_4->setPage(nineNumberPage[nineCounter]);
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+        Web9_4->setZoomFactor(1);
         nineNewClick(nineList[3]);
     }
     if (object == Web9_5 && event->type() == QEvent::MouseButtonPress) {
@@ -609,7 +619,8 @@ bool Window::eventFilter(QObject *object, QEvent *event){
         Web9_5->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_5->setPage(nineNumberPage[nineCounter]);
-
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+        Web9_5->setZoomFactor(1);
         nineNewClick(nineList[4]);
     }
     if (object == Web9_6 && event->type() == QEvent::MouseButtonPress) {
@@ -618,6 +629,8 @@ bool Window::eventFilter(QObject *object, QEvent *event){
         Web9_6->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_6->setPage(nineNumberPage[nineCounter]);
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+        Web9_6->setZoomFactor(1);
         nineNewClick(nineList[5]);
     }
     if (object == Web9_7 && event->type() == QEvent::MouseButtonPress) {
@@ -626,6 +639,8 @@ bool Window::eventFilter(QObject *object, QEvent *event){
         Web9_7->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_7->setPage(nineNumberPage[nineCounter]);
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+        Web9_7->setZoomFactor(1);
         nineNewClick(nineList[6]);
     }
     if (object == Web9_8 && event->type() == QEvent::MouseButtonPress) {
@@ -634,6 +649,8 @@ bool Window::eventFilter(QObject *object, QEvent *event){
         Web9_8->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_8->setPage(nineNumberPage[nineCounter]);
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+        Web9_8->setZoomFactor(1);
         nineNewClick(nineList[7]);
     }
     if (object == Web9_9 && event->type() == QEvent::MouseButtonPress) {
@@ -642,6 +659,8 @@ bool Window::eventFilter(QObject *object, QEvent *event){
         Web9_9->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_9->setPage(nineNumberPage[nineCounter]);
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+        Web9_9->setZoomFactor(1);
         nineNewClick(nineList[8]);
     }
     if (object == fitnessSlider && event->type() == QEvent::MouseButtonRelease) {
@@ -720,15 +739,15 @@ void Window::nineGenerateNew(){
         nineList.append(r);
     }
     QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-    Web9_1->setZoomFactor(21);
-    Web9_2->setZoomFactor(21);
-    Web9_3->setZoomFactor(21);
-    Web9_4->setZoomFactor(21);
-    Web9_5->setZoomFactor(21);
-    Web9_6->setZoomFactor(21);
-    Web9_7->setZoomFactor(21);
-    Web9_8->setZoomFactor(21);
-    Web9_9->setZoomFactor(21);
+    Web9_1->setZoomFactor(1);
+    Web9_2->setZoomFactor(1);
+    Web9_3->setZoomFactor(1);
+    Web9_4->setZoomFactor(1);
+    Web9_5->setZoomFactor(1);
+    Web9_6->setZoomFactor(1);
+    Web9_7->setZoomFactor(1);
+    Web9_8->setZoomFactor(1);
+    Web9_9->setZoomFactor(1);
     QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
     Web9_1->setPage(webPageVector[nineList[0]]);
     Web9_2->setPage(webPageVector[nineList[1]]);
@@ -777,7 +796,7 @@ void Window::init(){
     settings.insert("S_swapPropa",S_swapPropa);
     settings.insert("S_BasicCrossProba",S_BasicCrossProba);
     settings.insert("S_BasicCrossProbaKey",S_BasicCrossProbaKey);
-    settings.insert("S_BasicCrossProbaValue",S_BasicCrossProbaValue);
+    //settings.insert("S_BasicCrossProbaValue",S_BasicCrossProbaValue);
     settings.insert("S_BasicCrossKeepLengthProb",S_BasicCrossKeepLengthProb);
     settings.insert("S_gaussLevel",S_gaussLevel);
     settings.insert("S_gaussSigma",S_gaussSigma);

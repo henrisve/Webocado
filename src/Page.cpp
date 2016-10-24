@@ -59,15 +59,7 @@ void Page::updatePage(Page &newPage){
     mPageID=newPage.mPageID;
     mURL=newPage.mURL;
     ComputedStyleList=newPage.ComputedStyleList;
-    qDebug() << "this:" << mBentoTree->mRootBlock->mChildren.size() << endl;
-    qDebug() << "new" << newPage.mBentoTree->mRootBlock->mChildren.size() << endl;
-    if(newPage.mBentoTree!=this->mBentoTree){
-        copyPage(mBentoTree->mRootBlock,newPage.mBentoTree->mRootBlock);
-    }else{
-        qDebug()<< endl<< endl<< endl << "alredy same??" << endl<< endl<< endl<< endl;
-    }
-    qDebug() << "thisafter:" << mBentoTree->mRootBlock->mChildren.size() << endl;
-    qDebug() << "newafter:" << newPage.mBentoTree->mRootBlock->mChildren.size() << endl;
+    copyPage(mBentoTree->mRootBlock,newPage.mBentoTree->mRootBlock);
 
 }
 
@@ -98,39 +90,13 @@ void Page::copyPage(BentoBlock* copyBlock,BentoBlock* orgBlock){
     }else{
         qDebug() << "*";
     }
-    if(orgBlock->mLevel == 0) qDebug() << "c3" << "this:" << mBentoTree->mRootBlock->mChildren.size() << endl;
     if(orgBlock->mLevel == 0 && copyBlock == orgBlock)qDebug() << "ncitfu"<< endl;
     copyBlock->mChildren.clear(); //should already be clear, except for maybe first time!
-    if(orgBlock->mLevel == 0) qDebug() << "c4.size" << "this:" << orgBlock->mChildren.size() << endl;
     for (int i=0; i<orgBlock->mChildren.size(); i++) {
         copyBlock->mChildren.append(new BentoBlock);
         copyBlock->mChildren[i]->mParent=copyBlock;
-
         copyPage(copyBlock->mChildren[i],orgBlock->mChildren[i]);
     }
-    if(orgBlock->mLevel == 0)qDebug() << "c5" << "this:" << mBentoTree->mRootBlock->mChildren.size() << endl;
-    if(orgBlock->mLevel == 0)qDebug() << "c6.size" << "this:" << orgBlock->mChildren.size() << endl;
-    if(orgBlock->mLevel == 0)qDebug() << "c7.size" << "this:" << copyBlock->mChildren.size() << endl;
-
-//    qDebug()<< "-----------------------this is where --------------------------------" << orgBlock->mBentoID << this->mPageID;;
-
-//    QList<QString> keys = ComputedStyleList.keys();
-//    foreach (QString key, keys) {
-//        qDebug() << endl<< "the key "<< key << "= ";
-//        foreach(QString value, ComputedStyleList.value(key)){
-//            qDebug() << value << ", ";
-//        }
-//    }
-//    qDebug()<< "-------------------------------------------------------------------";
-//    QList<QString> keys2 = orgBlock->mComputedStyles.keys();
-//    foreach (QString key, keys2) {
-//        qDebug() <<endl<< key << "is" << orgBlock->mComputedStyles.value(key) ;
-//    }
-//    qDebug()<< "-------------------------------------------------------------------";
-//    QList<QString> keys3 = copyBlock->mComputedStyles.keys();
-//    foreach (QString key, keys3) {
-//        qDebug() <<endl<< key << "is" << copyBlock->mComputedStyles.value(key) ;
-//    }
 }
 
 
@@ -141,17 +107,13 @@ void Page::updateStyleList(BentoBlock* bentoBlock){
     }
     QHash<QString, QString> ComputedStyles = bentoBlock->getStyles();
     QList<QString> keys = ComputedStyles.keys();
-    //Qlist<QString> temp;
     foreach (QString key, keys) {
         QString styleValue = ComputedStyles.value(key);
-        //if(key == "height") qDebug() << "hstyleValue:" << styleValue;
         int index=addStyles(styleValue,key);
 
         int size=ComputedStyleList.value(key).size();
-        //if(key == "height") qDebug() << "hstyleSize:" << size;
         bentoBlock->setStyles(index,key,size);
     }
-    //qDebug() << bentoBlock->mChildren.size();
     for(int i=0; i<bentoBlock->mChildren.size(); i++) {
         updateStyleList(bentoBlock->mChildren[i]);
     }
@@ -186,7 +148,6 @@ int Page::addStyles(QString styleValue, QString key){
         index=size;
     }
     return index;
-    //QMap<QString, QVector<QString> > ComputedStyleList;
 }
 
 void Page::updateStyles(BentoBlock* bentoBlock){
@@ -216,16 +177,3 @@ void Page::printList(const QWebElement& domNode,int g_x) {
     for(uint j=0; j<g_x;j++) qDebug() << ".    ";
     qDebug()   << "}"<< endl;
 }
-
-//void Page::crossOverBasic(){
-////    if(!pRand(BasicCrossProba)) return;
-////    foreach(QString key,getKeys()){
-////        if(!pRand(BasicCrossProbaKey) || !ComputedStyleList.contains(key)) continue;
-////        foreach (QString value, ComputedStyleList[key]) {
-
-////        }
-////    }
-
-//    //ComputedStyleList
-
-//}

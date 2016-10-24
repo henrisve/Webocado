@@ -127,12 +127,12 @@ void igacado::updateSettings(){
     tournamentSize = (int)settings->value("S_evolTsize")->value();
     BasicCrossProba = settings->value("S_BasicCrossProba")->value();
     BasicCrossProbaKey = settings->value("S_BasicCrossProbaKey")->value();
-    BasicCrossProbaValue = settings->value("S_BasicCrossProbaValue")->value();
+    //BasicCrossProbaValue = settings->value("S_BasicCrossProbaValue")->value();
 
     BasicCrossKeepLengthProb = settings->value("S_BasicCrossKeepLengthProb")->value();
 
 
-    //swapPropa = settings->value("S_swapPropa")->value();
+ swapPropa = settings->value("S_swapPropa")->value();
     sizeChangeProba = (int)settings->value("S_sizeChangeProba")->value();
     sizeChangefitness = (int)settings->value("S_Size_fitness")->value();
     double mean = settings->value("S_Size_mean")->value();
@@ -176,9 +176,7 @@ void igacado::nextIndividual(double fitness){//bool like,int time){
         qDebug() << "oooh, this generation is over, time to kill the old guys and hatch those new eggs!" << endl;
         currGeneration++; //for now we wont stop when we get to number of generation
         currIndividial=0;
-        qDebug() << "f1" << population[0][1].mBentoTree->mRootBlock->mChildren.size()<< " : " <<population[0][1].mBentoTree->mRootBlock->mChildren.size() << endl;
         nextGeneration();
-        qDebug() << "f2" << population[0][1].mBentoTree->mRootBlock->mChildren.size()<< " : " <<population[0][1].mBentoTree->mRootBlock->mChildren.size() << endl;
     }
     updateSettingWidgets();
 
@@ -203,7 +201,6 @@ void igacado::nextGeneration(){
         evolveType[qrand()% evolveType.size()].first=5;
 
     }
-    qDebug() << "ge2" << population[0][1].mBentoTree->mRootBlock->mChildren.size()<< " : " <<population[0][1].mBentoTree->mRootBlock->mChildren.size() << endl;
 
 
     //QVector< QVector<QColor> > colorCopy;
@@ -375,16 +372,9 @@ void igacado::nextGeneration(){
     }
     for(int i=0;i<elitesindex.size();i++){
         int index=popSize()-elitesindex.size()+i;
-        population[0][index]=population[0][elitesindex[i]+popSize()];
+        population[0][index].updatePage(population[0][elitesindex[i]+popSize()]);
     }
 
-
-//    if(!isEven(populationSize)){//floor(populationSize/2)*2 != populationSize){ //if uneven, just copy the last as is, probably better way to check it
-//        int i=populationSize-1;
-//        population[0][i].updatePage(population[0][newindsort[i]+populationSize]);
-//        fitnessList[i]=fitnessCopy[newindsort[i]];
-//        //mutateColor(i);
-//    }
     qDebug() << "Done " << endl;
 }
 
@@ -408,7 +398,6 @@ int igacado::tournamentSelection(QList<QPair<double,int> > array, double tournam
 // Do basic crossover for allitems
 //#####################################################################
 void igacado::crossOverBasic(bricolage::Page* mPage1,bricolage::Page* mPage2/*,bool keep_length*/){
-    //if(!pRand(BasicCrossProba)) return;    <-----  Put this outside before calling instead.
     QVector<QString> keys;//Only keeps keys that are in both.
     QStringList keysEvol = getEvolKeys();
 
@@ -488,22 +477,6 @@ void igacado::crossOverBasic(bricolage::Page* mPage1,bricolage::Page* mPage2/*,b
             mPage1->ComputedStyleList[key]=list1n;
             mPage2->ComputedStyleList[key]=list2n;
         }
-
-        //        } //For now only do standard crossover for all, numbers should be done different???
-        // QList<int> = for(int i=0;i<10;i++) i;
-
-
-        //        foreach (QString value1, ) {
-        //            foreach (QString value2,mPage2->ComputedStyleList[key]) {
-        //                if(pRand(BasicCrossProbaValue)){
-
-        //                    QList<double> newintlist= getNumberFromQString(mPage->ComputedStyleList[key][i]);//
-        //                    if(!newintlist.isEmpty()){
-
-        //                    }
-        //                }
-        //            }
-        //        }
     }
 }
 //#####################################################################
@@ -523,7 +496,6 @@ void igacado::mutate(int i){
                 if(pRand(sizeChangeProba)){
                     mutateNumeric(&population[0][i],key,i);
                 }
-                //keys << key1;
                 break;
             }
         }
@@ -531,7 +503,7 @@ void igacado::mutate(int i){
 
 }
 //#####################################################################
-// Function MutateSize
+// Function MutateNumeric
 // Mutates styles that dont have a special function   ##Maybe should be numerical mutate, and use all numerical things in in??
 //#####################################################################
 void igacado::mutateNumeric(bricolage::Page* mPage, QString key, int unicorn){
@@ -590,8 +562,6 @@ void igacado::mutateNumeric(bricolage::Page* mPage, QString key, int unicorn){
 //#####################################################################
 void igacado::mutateColor(int i){ //not only color, use for everything!
 
-
-
     if(pRand(ColorRot)){
         double cMDiff = (1-fitnessList[i]);
         //Todo: change all these to gaussian!!
@@ -611,8 +581,6 @@ void igacado::mutateColor(int i){ //not only color, use for everything!
     if(pRand((1-fitnessList[i])*ColorRand)) { //todo parameter for how much the fitness affect is needed
         rotateColor(&population[0][i],-1,qrand() % 360,(qrand() % 200)-100,(qrand() % 200)-100);
     }
-
-    // changeColor(0,0,0,0,0);
 }
 
 
@@ -634,8 +602,6 @@ void igacado::rotateColor(bricolage::Page *mPage,int index,int dh,int ds, int dl
             int l=(dl + mPage->mColor[i].lightness() ); // todo, try without %, migth be added in the qcolor already
             s = (s>255 ? 255 : (s<0 ? 0 : s));
             l = (l>255 ? 255 : (l<0 ? 0 : l));//max-min, to keep s in limit 0-255
-            //qDebug() << " h:" <<h << " s:"<< s << " l:"<< l << endl;
-
             mPage->mColor[i].setHsl(h,s,l,mPage->mColor[i].alpha());
         }
     }else{
@@ -672,27 +638,28 @@ void igacado::newColor(QVector<QColor>* currColors,int colorSize){
 void igacado::mutateElementColor(bricolage::Page *mpage, bricolage::BentoBlock* bentoBlock, int ColorSize){
 
     //Todo, add for other than color
-    //I thougt this is done.. but cant find it????
+    //I thougt this is done before.. but cant find it????
     QStringList keys=getEvolKeys();
-//    foreach (QString key, keys) {//This doesnt work....
-//        //todo needs probabilutys
-//        int size= mpage->ComputedStyleList[key].size();
-//        if(bentoBlock->mComputedStyles.contains(key)){
-//            //qDebug() << "index before" <<bentoBlock->mComputedStyles[key].first << "size acc to old " << bentoBlock->mComputedStyles[key].second<< "real size" << size << endl;
-//            bentoBlock->mComputedStyles[key].first= qrand()%size;
-//        }
-//    }
+    foreach (QString key, keys) {//This doesnt work....
+        if(pRand(swapPropa)){
+            int size= mpage->ComputedStyleList[key].size();
+            if(bentoBlock->mComputedStyles.contains(key)){
+                //qDebug() << "index before" <<bentoBlock->mComputedStyles[key].first << "size acc to old " << bentoBlock->mComputedStyles[key].second<< "real size" << size << endl;
+                bentoBlock->mComputedStyles[key].first= qrand()%size;
+            }
+        }
+    }
     //above other
 
     //This part does something.. I really need to track what Im doing..
-    if(bentoBlock->mDomNodeID!=-1){
-        //Why is this here??
-        if(bentoBlock->mDomNodeID < mpage->mDOMNodes.size()){
-            QWebElement temp = mpage->mDOMNodes[bentoBlock->mDomNodeID];
-            bentoBlock->mDOMNode = temp;
-            //test
-        }
-    }
+//    if(bentoBlock->mDomNodeID!=-1){
+//        //Why is this here??
+//        if(bentoBlock->mDomNodeID < mpage->mDOMNodes.size()){
+//            QWebElement temp = mpage->mDOMNodes[bentoBlock->mDomNodeID];
+//            bentoBlock->mDOMNode = temp;
+//            //test
+//        }
+//    }
 
     //below, color
     if(evolveType[0].first>0){
@@ -710,7 +677,7 @@ void igacado::mutateElementColor(bricolage::Page *mpage, bricolage::BentoBlock* 
             if(pRand(mRateCE_t*gaussFactor)){
                 do{
                     bentoBlock->mtColor=qrand() % (ColorSize);
-                }while(bentoBlock->mtColor!=bentoBlock->mbgColor); //don't allow same text as background
+                }while(bentoBlock->mtColor!=bentoBlock->mbgColor && ColorSize > 1); //don't allow same text as background
             }
         }
     }
@@ -846,11 +813,11 @@ const QStringList igacado::borderKeyList = QStringList() <<"border" << "border-b
                                                            "border-right-style" << "border-right-width" << "border-spacing" << "border-style" <<
                                                            "border-top" <<  "border-top-left-radius" << "border-top-right-radius" << "border-top-style" <<
                                                            "border-top-width" << "border-width" << "outline"  << "outline-offset" << "outline-style" <<"outline-width";
-//const QStringList igacado::sizeKeyList = QStringList() << "a1";
-//const QStringList igacado::positionKeyList = QStringList() << "a2";
-//const QStringList igacado::textKeyList = QStringList() << "a3";
-//const QStringList igacado::otherKeyList = QStringList() << "a4";
-//const QStringList igacado::borderKeyList = QStringList() << "a5";
+//const QStringList igacado::sizeKeyList = QStringList() << "size";
+//const QStringList igacado::positionKeyList = QStringList() << "top";
+//const QStringList igacado::textKeyList = QStringList() << "font";
+//const QStringList igacado::otherKeyList = QStringList() << "display";
+//const QStringList igacado::borderKeyList = QStringList() << "border";
 
 
 const QStringList igacado::colorKeyList = QStringList() <<"color-dummy";

@@ -47,18 +47,6 @@ public:
         }
         return keyOut;
     }
-    //Because we now using sorted list it dont make sense to swap
-//    void swapStyle(QString key){
-//        int size= ComputedStyleList[key].size();
-//        if(size > 1){
-//            int a = qrand()%size;
-//            int b = qrand()%size;
-//            if(a!=b) swapStyle(key,a,b);
-//        }
-//    }
-//    void swapStyle(QString key,int a,int b){
-//         std::swap(ComputedStyleList[key][a],ComputedStyleList[key][b]);
-//    }
 
 
     //Temp
