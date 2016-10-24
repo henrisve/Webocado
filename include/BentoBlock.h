@@ -68,9 +68,9 @@ public:
         QList<QString> keys = mComputedStyles.keys();
         foreach (QString key, keys) {
             int index=mComputedStyles.value(key).first;
-            if(index >= styleList->value(key).size()){
-                index=styleList->value(key).size()-1;
-            }
+//            if(index >= styleList->value(key).size()){
+//                index=styleList->value(key).size()-1;
+//            }
             //qDebug() << "this" <<index <<" of "<<mComputedStyles.value(key).second << "keys size "<<keys.size()<<"stylist size"<<styleList->size()<<"mComputedStyles.size"<<mComputedStyles.size()<<endl;
             mDOMNode.setStyleProperty(key,styleList->value(key).at(index) + " !important");
 
