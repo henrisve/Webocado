@@ -323,7 +323,14 @@ void Window::popBuildColorList() {
 }
 void Window::buildColorList(Page *mPage) {
     //mPage->ComputedStyleList.clear();
-    mPage->mColor.clear();
+    if(pRand()){
+        mPage->mColor.clear();
+    }
+    if(mPage->mColor.empty()){
+        QColor tranp;
+        tranp.setRgb(0,0,0,0);
+        mPage->mColor.append(tranp);
+    }
     buildColorList(mPage->mBentoTree->mRootBlock,&mPage->mColor);
 }
 
@@ -362,6 +369,9 @@ void Window::buildColorList(BentoBlock *bentoBlock,QVector<QColor>* colorList){
 
 //This should be in the bentoblock file! haha. FML
 void Window::addColor(int &colorBlock,QVector<QColor>* colorList, QColor newColor){
+    if(newColor.alpha()==0){
+        colorBlock=0;
+    }
     int index=colorIndex(colorList, newColor);
     if(index<0){
         colorList->append(newColor);
@@ -549,7 +559,6 @@ void Window::updateColorTable(){
             ColorTable->item(i,j)->setBackgroundColor(population[i].mColor[j].rgb());
         }
     }
-
 }
 
 ////Remove!1

@@ -7,12 +7,12 @@
 #include <QHash>
 #include <QDoubleSpinBox>
 #include  <random>
-
+#include <QColor>
 
 
 
 //For test?
-#include <QColor>
+
 //Now
 /* TODO!
  * Important todo
@@ -209,7 +209,7 @@ void igacado::nextGeneration(){
     for(int i=0;i<populationSize;i++){
         population[0][i+populationSize].updatePage(population[0][i]);
     }
-    qDebug() << "ge3" << population[0][1].mBentoTree->mRootBlock->mChildren.size()<< " : " <<population[0][1].mBentoTree->mRootBlock->mChildren.size() << endl;
+    //qDebug() << "ge3" << population[0][1].mBentoTree->mRootBlock->mChildren.size()<< " : " <<population[0][1].mBentoTree->mRootBlock->mChildren.size() << endl;
 
     qDebug() << "Done, create new population, the following is done:" << endl;
     QVector<int> newindsort;
@@ -217,6 +217,10 @@ void igacado::nextGeneration(){
     QVector<int> islandPop;
     QVector<int> islandPopSize;
     QVector<double> islandFitness;
+    //OKay, soo, I need to change this.. because of the adding of elite, this wont work. 2 alternatives
+    //1: Add list of population to each island
+    //2: change how elite works, this should be easiest. then check this again.
+    //probably need to redo anyway.. seems strange with the avraging  thing: (islandFitness[island-1]/=(int)islandPopSize[island-1])))
     bool islandMode=true;//move out as a setting
     if(islandMode){
         //QVector<int> populationIsland;
@@ -236,11 +240,13 @@ void igacado::nextGeneration(){
             }
         }
     }
-    qDebug() << "ge4" << population[0][1].mBentoTree->mRootBlock->mChildren.size()<< " : " <<population[0][1].mBentoTree->mRootBlock->mChildren.size() << endl;
+
+    //qDebug() << "ge4" << population[0][1].mBentoTree->mRootBlock->mChildren.size()<< " : " <<population[0][1].mBentoTree->mRootBlock->mChildren.size() << endl;
 
     int previousIsland;
     double crossIslandProb=0.02; ///////////////////////////  MOVE THIS OUTSIDE!!
-    for(int i=0;i<populationSize-islandFitness.size()+1;i++){
+    //for(int i=0;i<populationSize-islandFitness.size()+1;i++){
+    for(int i=0;i<floor(populationSize/2)*2;i++){
     // for(int i=0;i<populationSize;i++){
         //QList<int> tsIndexlist;
         //QList<double> tsFitnesslist;
@@ -251,7 +257,8 @@ void igacado::nextGeneration(){
             /*if(i<islandFitness.size()*2){
                 randIsland=floor(i/2);
                 previousIsland=randIsland;
-            }else */if(isEven(i) || pRand(crossIslandProb)){
+            }else */
+            if(isEven(i) || pRand(crossIslandProb)){
                 std::vector<int> weights;
                 for(int i=0; i<islandFitness.size(); i++) {
                     weights.push_back(100+islandFitness[i]*100); //100+ makes the weigt "more equal"
@@ -300,7 +307,7 @@ void igacado::nextGeneration(){
         indexsort.insert(ji,i);
 
     }
-    qDebug() << "ge5" << population[0][1].mBentoTree->mRootBlock->mChildren.size()<< " : " <<population[0][1].mBentoTree->mRootBlock->mChildren.size() << endl;
+    //qDebug() << "ge5" << population[0][1].mBentoTree->mRootBlock->mChildren.size()<< " : " <<population[0][1].mBentoTree->mRootBlock->mChildren.size() << endl;
 
 
 //    foreach (int ao, newindsort) {
@@ -312,8 +319,8 @@ void igacado::nextGeneration(){
     //            fitnessList[i]=fitnessCopy[newindsort[i]]; //the fitness variable should have been in each page object...
     //        }
 
-    //for(int i=0;i<floor(populationSize/2)*2;i+=2){ //rounds down to even number
-    for(int i=0;i<populationSize-islandFitness.size();i+=2){ //for readability, should be other than islandfitness, is just the number of islands
+    for(int i=0;i<floor(populationSize/2)*2;i+=2){ //rounds down to even number
+    //for(int i=0;i<populationSize-islandFitness.size();i+=2){ //for readability, should be other than islandfitness, is just the number of islands
         do{
             population[0][i].updatePage(population[0][newindsort[i]+populationSize]);
             population[0][i+1].updatePage(population[0][newindsort[i+1]+populationSize]);
@@ -323,8 +330,8 @@ void igacado::nextGeneration(){
             int i2 = indexsort[i+1];
             int s1 = population[0][i1].mColor.size();
             int s2 = population[0][i2].mColor.size();
-            int p1start = s1>1 ? qrand()%(s1-1) : 0;
-            int p2start = s2>1 ? qrand()%(s2-1) : 0;
+            int p1start = s1>1 ? (qrand()%(s1-2))+1 : 0;
+            int p2start = s2>1 ? (qrand()%(s2-2))+1 : 0;
             int maxlen = s1-p1start < s2-p2start ? s1-p1start : s2-p2start;
             int len = qrand()%maxlen;
 
@@ -352,7 +359,7 @@ void igacado::nextGeneration(){
 
         }while(false); //insert the Machine learning here? so if the ml think the new page is bad it will create a new pace insead.
     }
-    qDebug() << "ge6" << population[0][1].mBentoTree->mRootBlock->mChildren.size()<< " : " <<population[0][1].mBentoTree->mRootBlock->mChildren.size() << endl;
+    //qDebug() << "ge6" << population[0][1].mBentoTree->mRootBlock->mChildren.size()<< " : " <<population[0][1].mBentoTree->mRootBlock->mChildren.size() << endl;
 
     /* Find elites
      */
@@ -362,18 +369,48 @@ void igacado::nextGeneration(){
         elites.append(0);
         elitesindex.append(0); //is there a better way to fill??
     }
-
     for(int i=0;i<popSize();i++){
         int island=population[0][i+popSize()].mPageID;
         if(fitnessCopy[i]>elites[island]){
             elites[island]=fitnessCopy[i];
-                elitesindex[island]=i;
+            elitesindex[island]=i;
         }
     }
+
+    //todo, dont work because islandpop is before selection, thus we need to recalculate it
+   if(islandMode){
+       islandPop.clear();
+       islandPopSize.clear();
+       islandFitness.clear();
+       //QVector<int> populationIsland;
+       //calc island pop//calc island fitness
+       for(int i=0;i<populationSize;i++){
+           int island=population[0][i].mPageID;
+           if(island>=islandPop.size()){
+               islandPop.append(i);
+               islandPopSize.append(1);
+               islandFitness.append(fitnessCopy[i]);
+               if(island>0){
+                   islandFitness[island-1]/=(int)islandPopSize[island-1];//islandPop[island]-islandPop[island-1];
+               }
+           }else{
+               islandPopSize[island]++;
+               islandFitness[island]+=fitnessCopy[i];
+           }
+       }
+   }
     for(int i=0;i<elitesindex.size();i++){
-        int index=popSize()-elitesindex.size()+i;
+        int index=islandPop[i]+islandPopSize[i]-1;
+        qDebug() << "pop" << islandPop[i] << "+" << islandPopSize[i]<< "=" << index << endl;
+        //population[0][elitesindex[0]+popSize()].mColor[1].setRgb(255,0,255,200);
         population[0][index].updatePage(population[0][elitesindex[i]+popSize()]);
+
+
     }
+//    int i=1;
+//        int index=popSize()-elitesindex.size()+i;
+//        population[0][index].updatePage(population[0][elitesindex[i]+popSize()]);
+//    //}
 
     qDebug() << "Done " << endl;
 }
@@ -594,7 +631,7 @@ void igacado::mutateColor(int i){ //not only color, use for everything!
 void igacado::rotateColor(bricolage::Page *mPage,int index,int dh,int ds, int dl){
 
     if(index < 0){
-        for(int i = 0; i < mPage->mColor.size();i++){
+        for(int i = 1; i < mPage->mColor.size();i++){ //skip first, thats the tranparant.
             int h=(dh + mPage->mColor[i].hslHue() )%359; //360 including 0
             h= ((h < 0) ? h+359 : h);  //modulus in c++ return negative number
             int s=(ds + mPage->mColor[i].hslSaturation() ); //should these be like "wheel, or -5 be threted as 0?
@@ -670,14 +707,22 @@ void igacado::mutateElementColor(bricolage::Page *mpage, bricolage::BentoBlock* 
             ColorSize++;
         }else{
             double gaussFactor=gaussian(bentoBlock->mLevel);
-            if(pRand(mRateCE_t*gaussFactor)) bentoBlock->moutlineColor=qrand() % (ColorSize);
-            if(pRand(mRateCE_t*gaussFactor)) bentoBlock->mlinkColor=qrand()+1 % (ColorSize);
-            if(pRand(mRateCE_t*gaussFactor)) bentoBlock->mborderColor=qrand()+2 % (ColorSize);
-            if(pRand(mRateCE_t*gaussFactor)) bentoBlock->mbgColor=qrand()+3 % (ColorSize); //becauce for some reason qrand likes to give the same value multiple time..
+            if(pRand(mRateCE_t*gaussFactor)) bentoBlock->moutlineColor=(qrand() % (ColorSize-1))+1; //-1))+1, we dont want text to be tranparant
+            if(pRand(mRateCE_t*gaussFactor)) bentoBlock->mlinkColor=((qrand()+1) % (ColorSize-1))+1;  //gives error if colorsize 1, but should be impossible to be?
+            if(pRand(mRateCE_t*gaussFactor)) bentoBlock->mborderColor=((qrand()+2) % (ColorSize-1))+1;
+            if(pRand(mRateCE_t*gaussFactor)) bentoBlock->mbgColor=((qrand()+3) % (ColorSize)); //becauce for some reason qrand likes to give the same value multiple time..
             if(pRand(mRateCE_t*gaussFactor)){
+                int trueBgColor=bentoBlock->mbgColor;
+                bricolage::BentoBlock* parentTempBlock=bentoBlock;
+                while(trueBgColor == 0/* && bentoBlock->mParent != 0*/){
+                    if(parentTempBlock->mParent == 0) break;
+                    parentTempBlock = parentTempBlock->mParent;
+                    trueBgColor=parentTempBlock->mbgColor;
+                }
+                //if bentoBlock->mbgColor==
                 do{
-                    bentoBlock->mtColor=qrand() % (ColorSize);
-                }while(bentoBlock->mtColor!=bentoBlock->mbgColor && ColorSize > 1); //don't allow same text as background
+                    bentoBlock->mtColor=(qrand()+4) % (ColorSize);
+                }while(bentoBlock->mtColor==trueBgColor && ColorSize > 1); //don't allow same text as background
             }
         }
     }

@@ -187,7 +187,7 @@ public:
                         a = rgba[3].toInt(&okay); Q_ASSERT(okay);
                     }
                     if(a<1){ //if totaly transparant
-                        colorFeature.setRgb(255,0,0,0);
+                        colorFeature.setRgb(0,0,0,0);
                         return colorFeature;
                     }
                 }

@@ -65,9 +65,9 @@ void Page::updatePage(Page &newPage){
 
 //should be under BentoBlock.h (or .cpp)??
 void Page::copyPage(BentoBlock* copyBlock,BentoBlock* orgBlock){
-    if(orgBlock->mLevel == 0) qDebug() << "c0" << "this:" << orgBlock->mChildren.size() << endl;
-    if(orgBlock->mLevel == 0) qDebug() << "c0.5" << "this:" << copyBlock->mChildren.size() << endl;
-    if(orgBlock->mLevel == 0) qDebug() << "c1" << "this:" << mBentoTree->mRootBlock->mChildren.size() << endl;
+    //if(orgBlock->mLevel == 0) qDebug() << "c0" << "this:" << orgBlock->mChildren.size() << endl;
+   // if(orgBlock->mLevel == 0) qDebug() << "c0.5" << "this:" << copyBlock->mChildren.size() << endl;
+   // if(orgBlock->mLevel == 0) qDebug() << "c1" << "this:" << mBentoTree->mRootBlock->mChildren.size() << endl;
     copyBlock->mBentoID=orgBlock->mBentoID; //This is probably pointers, soo maybe need the data??
     copyBlock->mbgColor=orgBlock->mbgColor;
     copyBlock->mborderColor=orgBlock->mborderColor;
@@ -83,14 +83,14 @@ void Page::copyPage(BentoBlock* copyBlock,BentoBlock* orgBlock){
     copyBlock->mSameSizeContent=orgBlock->mSameSizeContent;
     copyBlock->mtColor=orgBlock->mtColor;
     copyBlock->mComputedStyles=orgBlock->mComputedStyles;
-    if(orgBlock->mLevel == 0) qDebug() << "c2" << "this:" << mBentoTree->mRootBlock->mChildren.size() << endl;
+    //if(orgBlock->mLevel == 0) qDebug() << "c2" << "this:" << mBentoTree->mRootBlock->mChildren.size() << endl;
     if(copyBlock->mDomNodeID>0){ // why
         copyBlock->mDOMNode = mDOMNodes[copyBlock->mDomNodeID];
-        if(orgBlock->mLevel == 0) qDebug() << ".";
+    //    if(orgBlock->mLevel == 0) qDebug() << ".";
     }else{
-        qDebug() << "*";
+    //    qDebug() << "*";
     }
-    if(orgBlock->mLevel == 0 && copyBlock == orgBlock)qDebug() << "ncitfu"<< endl;
+    i//f(orgBlock->mLevel == 0 && copyBlock == orgBlock)qDebug() << "ncitfu"<< endl;
     copyBlock->mChildren.clear(); //should already be clear, except for maybe first time!
     for (int i=0; i<orgBlock->mChildren.size(); i++) {
         copyBlock->mChildren.append(new BentoBlock);
