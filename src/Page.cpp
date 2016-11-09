@@ -90,7 +90,7 @@ void Page::copyPage(BentoBlock* copyBlock,BentoBlock* orgBlock){
     }else{
     //    qDebug() << "*";
     }
-    i//f(orgBlock->mLevel == 0 && copyBlock == orgBlock)qDebug() << "ncitfu"<< endl;
+    //if(orgBlock->mLevel == 0 && copyBlock == orgBlock)qDebug() << "ncitfu"<< endl;
     copyBlock->mChildren.clear(); //should already be clear, except for maybe first time!
     for (int i=0; i<orgBlock->mChildren.size(); i++) {
         copyBlock->mChildren.append(new BentoBlock);
