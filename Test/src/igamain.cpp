@@ -437,82 +437,94 @@ int igacado::tournamentSelection(QList<QPair<double,int> > array, double tournam
 void igacado::crossOverBasic(bricolage::Page* mPage1,bricolage::Page* mPage2/*,bool keep_length*/){
     QVector<QString> keys;//Only keeps keys that are in both.
     QStringList keysEvol = getEvolKeys();
+    QStringList keysPage1 = mPage1->getKeys();
+    QStringList keysPage2 = mPage2->getKeys();
+
+//    foreach(QString key3, keysEvol)
+//        foreach (QString key, keys) {//This doesnt work....
+//            if(pRand(swapPropa)){
+//                int size= mpage->ComputedStyleList[key].size();
+//                if(bentoBlock->mComputedStyles.contains(key)){
+//                    //qDebug() << "index before" <<bentoBlock->mComputedStyles[key].first << "size acc to old " << bentoBlock->mComputedStyles[key].second<< "real size" << size << endl;
+//                    bentoBlock->mComputedStyles[key].first= qrand()%size;
+//                }
+//            }
+
+//    foreach(QString key3, keysEvol)
+//        //todo, replace with .contians
+//        foreach(QString key1, mPage1->getKeys()){
+
+//            if(key3!=key1){
+//                continue;
+//            }
+//            qDebug() << key1 << "match in 1" << key3 <<endl;
+
+//            foreach(QString key2, mPage2->getKeys()){
+
+//                if(key1==key2){
+//                    qDebug() << key1 << "match both!!" <<endl;
+//                    keys << key1;
+//                    break;
+//                }
+//            }
+//            qDebug() << key3 << "Done!!" <<endl;
+//            break;
+//        }
 
 
-    foreach(QString key3, keysEvol)
-        //todo, replace with .contians
-        foreach(QString key1, mPage1->getKeys()){
+ //   foreach(QString key,keys){
 
-            if(key3!=key1){
-                continue;
-            }
-            qDebug() << key1 << "match in 1" << key3 <<endl;
+    foreach(QString key, keysEvol){
 
-            foreach(QString key2, mPage2->getKeys()){
 
-                if(key1==key2){
-                    qDebug() << key1 << "match both!!" <<endl;
-                    keys << key1;
-                    break;
+        if(pRand(BasicCrossProbaKey) && (keysPage1.contains(key) || keysPage2.contains(key))){
+            qDebug() << "nananaaaaa basic cross thing";
+            if (keysPage1.contains(key) && !keysPage2.contains(key)){ //If key only exist in one, copy to the other.
+                 mPage2->ComputedStyleList[key]=mPage1->ComputedStyleList[key];
+            }else if(!keysPage1.contains(key) && keysPage2.contains(key)){
+                mPage1->ComputedStyleList[key]=mPage2->ComputedStyleList[key];
+            }else{
+                QVector<QString> list1=mPage1->ComputedStyleList[key];
+                QVector<QString> list2=mPage2->ComputedStyleList[key];
+                int s1 = list1.size();
+                int s2 = list2.size();
+                if(s1<2 && s2<2){ //if short, just swap whole list. "==1"
+                    if(pRand(BasicCrossKeepLengthProb) || s1==s2){
+                        mPage1->ComputedStyleList[key]=list2;
+                        mPage2->ComputedStyleList[key]=list1;
+                    }
+                }else{
+                    int p1start = qrand()%(s1);
+                    int p2start = qrand()%(s2);
+                    int len1;
+                    int len2;
+                    if(pRand(BasicCrossKeepLengthProb)){
+                        int maxlen = s1-p1start < s2-p2start ? s1-p1start : s2-p2start;
+                        len1 = qrand()%maxlen;
+                        len2 = len1;
+                    }else{
+                        len1= qrand()%(s1-p1start);
+                        len2= qrand()%(s2-p2start);
+                    }
+                    QVector<QString> list1n=list1.mid(0,p1start) + list2.mid(p2start,len2) + list1.mid(p1start+len1);
+                    QVector<QString> list2n=list2.mid(0,p2start) + list1.mid(p1start,len1) + list2.mid(p2start+len2);
+                    qSort(list1n.begin(),list1n.end(),letssThan);
+                    qSort(list2n.begin(),list2n.end(),letssThan);
+                    //Maybe the insert double wont work planned
+                    //ex. [1,2,3,4] => [1,1,2,2,3,4] for size 6.
+                    //
+                    for(int j=0; 0 < (s1-list1n.size()); j++){
+                        int pos=(j*2)%list1n.size();
+                        list1n.insert(pos,list1n[pos]);
+                    }
+                    for(int j=0; 0 < (s2-list2n.size()); j++){
+                        int pos=(j*2)%list2n.size();
+                        list2n.insert(pos,list2n[pos]);
+                    }
+                    mPage1->ComputedStyleList[key]=list1n;
+                    mPage2->ComputedStyleList[key]=list2n;
                 }
             }
-            qDebug() << key3 << "Done!!" <<endl;
-            break;
-        }
-
-
-    foreach(QString key,keys){
-        if(!pRand(BasicCrossProbaKey)) continue;
-        qDebug() << "nananaaaaa basic cross thing";
-        QVector<QString> list1=mPage1->ComputedStyleList[key];
-        QVector<QString> list2=mPage2->ComputedStyleList[key];
-        //        bool isNumber=!getNumberFromQString(list1[0]).isEmpty(); //true if a number
-        //        if(isNumber){
-        //            int s1=list1.size();
-        //            int s2=list2.size();
-        //            int sized=s1/s2;
-        //            int j=sized/2;
-        //            int dist=
-        //        }else{ //standard crossover
-
-        int s1 = list1.size();
-        int s2 = list2.size();
-        if(s1<2 && s2<2){ //if short, just swap whole list. "==1"
-            if(pRand(BasicCrossKeepLengthProb) || s1==s2){
-                mPage1->ComputedStyleList[key]=list2;
-                mPage2->ComputedStyleList[key]=list1;
-            }
-        }else{
-            int p1start = qrand()%(s1);
-            int p2start = qrand()%(s2);
-            int len1;
-            int len2;
-            if(pRand(BasicCrossKeepLengthProb)){
-                int maxlen = s1-p1start < s2-p2start ? s1-p1start : s2-p2start;
-                len1 = qrand()%maxlen;
-                len2 = len1;
-            }else{
-                len1= qrand()%(s1-p1start);
-                len2= qrand()%(s2-p2start);
-            }
-            QVector<QString> list1n=list1.mid(0,p1start) + list2.mid(p2start,len2) + list1.mid(p1start+len1);
-            QVector<QString> list2n=list2.mid(0,p2start) + list1.mid(p1start,len1) + list2.mid(p2start+len2);
-            qSort(list1n.begin(),list1n.end(),letssThan);
-            qSort(list2n.begin(),list2n.end(),letssThan);
-            //Maybe the insert double wont work planned
-            //ex. [1,2,3,4] => [1,1,2,2,3,4] for size 6.
-            //
-            for(int j=0; 0 < (s1-list1n.size()); j++){
-                int pos=(j*2)%list1n.size();
-                list1n.insert(pos,list1n[pos]);
-            }
-            for(int j=0; 0 < (s2-list2n.size()); j++){
-                int pos=(j*2)%list2n.size();
-                list2n.insert(pos,list2n[pos]);
-            }
-
-            mPage1->ComputedStyleList[key]=list1n;
-            mPage2->ComputedStyleList[key]=list2n;
         }
     }
 }
@@ -549,7 +561,7 @@ void igacado::mutateNumeric(bricolage::Page* mPage, QString key, int unicorn){
     for(int i=0;i<s;i++){
 
         QList<QPair<double,QString> > newintlist= getNumberFromQString(mPage->ComputedStyleList[key][i]);//
-        if(!newintlist.isEmpty()){
+        if(!newintlist.isEmpty()){ //only numerics.
             QString newstr;
             for(int j=0;j<newintlist.size();j++){
                 QPair<double,QString> newint =newintlist[j];
@@ -662,7 +674,12 @@ void igacado::newColor(QVector<QColor>* currColors,int colorSize){
     //int nNew = colorSize - currColors->size();
     int nOld =currColors->size();
     for(int i=nOld;i<colorSize;i++){
-        currColors->append(currColors[0][qrand()%nOld].lighter(qrand()%200+20)); //do we want this as parameter?? should also be able to add color?
+        if(pRand()){ //Todo, add parameter to gui
+            currColors->append(currColors[0][qrand()%nOld].lighter(qrand()%200+20)); //do we want this as parameter?? should also be able to add color?
+        }else{
+            currColors->append(QColor(qrand()%255,qrand()%255,qrand()%255,qrand()%255));//totally new color
+
+        }
     }
 
 }
