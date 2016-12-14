@@ -80,6 +80,7 @@ void igacado::initIgacado(QHash<QString,QDoubleSpinBox*> *set,QHash<QString,QLis
 
     fitnessList.clear();
     evolveType.clear();
+    parents.clear();
     evolveType.append(qMakePair(settings->value("S_Selective_Mut_Color")->value(),colorKeyList));
     evolveType.append(qMakePair(settings->value("S_Selective_Mut_Size")->value(),sizeKeyList));
     evolveType.append(qMakePair(settings->value("S_Selective_Mut_Pos")->value(),positionKeyList));
@@ -91,7 +92,10 @@ void igacado::initIgacado(QHash<QString,QDoubleSpinBox*> *set,QHash<QString,QLis
     numLim=numericLimits;
     populationSize=popSize;
 
-    for(int i=0;i<popSize;i++) fitnessList.append(0);//init the list of fitness to all 0
+    for(int i=0;i<popSize;i++){
+        fitnessList.append(0);//init the list of fitness to all 0
+        parents.append(qMakePair(0,0));
+    }
     //to make this  correct, use &pop above instead of *pop(and change [0][i] everywhere...)
     population=pop; //turn This into an 2-dimensional??
     currGeneration=0;
@@ -219,7 +223,7 @@ void igacado::nextGeneration(){
     QVector<double> islandFitness;
     //OKay, soo, I need to change this.. because of the adding of elite, this wont work. 2 alternatives
     //1: Add list of population to each island
-    //2: change how elite works, this should be easiest. then check this again.
+    //2: change how elite works, this should be easiest. then check this again. //I think I did this, so should be done?
     //probably need to redo anyway.. seems strange with the avraging  thing: (islandFitness[island-1]/=(int)islandPopSize[island-1])))
     bool islandMode=true;//move out as a setting
     if(islandMode){
@@ -231,20 +235,21 @@ void igacado::nextGeneration(){
                 islandPop.append(i);
                 islandPopSize.append(1);
                 islandFitness.append(fitnessCopy[i]);
-                if(island>0){
-                    islandFitness[island-1]/=(int)islandPopSize[island-1];//islandPop[island]-islandPop[island-1];
-                }
             }else{
                 islandPopSize[island]++;
                 islandFitness[island]+=fitnessCopy[i];
             }
+        }
+        for(int i=0;i<islandFitness.size();i++){
+            islandFitness[i]/=islandPopSize[i];
         }
     }
 
     //qDebug() << "ge4" << population[0][1].mBentoTree->mRootBlock->mChildren.size()<< " : " <<population[0][1].mBentoTree->mRootBlock->mChildren.size() << endl;
 
     int previousIsland;
-    double crossIslandProb=0.02; ///////////////////////////  MOVE THIS OUTSIDE!!
+    int prevIndivid=-1;
+    double crossIslandProb=0; ///////////////////////////  MOVE THIS OUTSIDE!!
     //for(int i=0;i<populationSize-islandFitness.size()+1;i++){
     for(int i=0;i<floor(populationSize/2)*2;i++){
     // for(int i=0;i<populationSize;i++){
@@ -258,11 +263,15 @@ void igacado::nextGeneration(){
                 randIsland=floor(i/2);
                 previousIsland=randIsland;
             }else */
+
             if(isEven(i) || pRand(crossIslandProb)){
+
                 std::vector<int> weights;
                 for(int i=0; i<islandFitness.size(); i++) {
-                    weights.push_back(100+islandFitness[i]*100); //100+ makes the weigt "more equal"
+                    weights.push_back(20+islandFitness[i]*10); //100+ makes the weigt "more equal"
+                    //qDebug() << weights.back() << " ; ";
                 }
+                //qDebug() << "woooooend " << endl;
 
                 std::discrete_distribution<> d(weights.begin(), weights.end()); // maybe tournament was better after all
                 randIsland=d(rng);
@@ -278,29 +287,39 @@ void igacado::nextGeneration(){
             }else{
                 randIsland=previousIsland;
             }
+            //Now we have selected the island we want,
         }
-
+        qDebug() << "island " << randIsland;
+        //This part prepare the list for tournament
         QList<QPair<double,int> > tslist;
         for(int j=0;j<tournamentSize;j++){
             int newind;
-            if(islandMode){
-                newind=(qrand()%islandPopSize[randIsland]) + islandPop[randIsland];
-            }else{
-                newind=qrand()%populationSize;
-            }
+            do{
+                if(islandMode){
+                    newind=((qrand()+j+i)%islandPopSize[randIsland]) + islandPop[randIsland];
+                }else{
+                    newind=qrand()%populationSize;
+                }
+            }while(newind == prevIndivid && pRand(0.99));
             //tsIndexlist.append(newind); //todo, better to use qpair.
             //tsFitnesslist.append(fitnessCopy[newind]);
             tslist.append(qMakePair(fitnessCopy[newind],newind));
 
         }
-
-
-        qSort(tslist.begin(), tslist.end(), QPairFirstComparer());
+        qSort(tslist.begin(), tslist.end(), QPairFirstComparer()); //Sort for the tournament
         int newind=tournamentSelection(tslist, tournamentSelectionParameter);
+        qDebug() << "newind " << newind << endl;
+        prevIndivid=newind;
+
+
         //same but sort
         int ji=0;
         for(int j=0;j<newindsort.size();j++){
-            if(newind<=newindsort[j]) break;
+            if(newind<=newindsort[j]){
+                //newindsort.insert(j,newind);
+                //indexsort.insert(j,i); //why do we even need to know this?
+                break;
+            }
             ji++;
         }
         newindsort.insert(ji,newind);
@@ -322,12 +341,20 @@ void igacado::nextGeneration(){
     for(int i=0;i<floor(populationSize/2)*2;i+=2){ //rounds down to even number
     //for(int i=0;i<populationSize-islandFitness.size();i+=2){ //for readability, should be other than islandfitness, is just the number of islands
         do{
-            population[0][i].updatePage(population[0][newindsort[i]+populationSize]);
-            population[0][i+1].updatePage(population[0][newindsort[i+1]+populationSize]);
-            fitnessList[i]=fitnessCopy[newindsort[i]]; //the fitness variable should have been in each page object...
+            //population[0][i].updatePage(population[0][newindsort[i]+populationSize]);
+            //population[0][i+1].updatePage(population[0][newindsort[i+1]+populationSize]);
+            //fitnessList[i]=fitnessCopy[newindsort[i]]; //the fitness variable should have been in each page object...
 
             int i1 = indexsort[i];
             int i2 = indexsort[i+1];
+            int is1= newindsort[i];
+            int is2= newindsort[i+1];
+            population[0][i1].updatePage(population[0][is1+populationSize]);
+            population[0][i2].updatePage(population[0][is2+populationSize]);
+            qDebug() << "new individs" << i1 <<" and " <<i2 << " from " <<is1<< " and " << is2 << endl;
+            fitnessList[i1]=fitnessCopy[newindsort[i1]]; //the fitness variable should have been in each page object...
+            fitnessList[i2]=fitnessCopy[newindsort[i2]];
+
             int s1 = population[0][i1].mColor.size();
             int s2 = population[0][i2].mColor.size();
             int p1start = s1>1 ? (qrand()%(s1-2))+1 : 0;
@@ -348,8 +375,29 @@ void igacado::nextGeneration(){
                 population[0][i2].mColor.clear();
                 population[0][i2].mColor=starttemp2 + midtemp + endtemp2;
             }
-            mutate(i1);
+
+            mutate(i1); //should it really be i1/i2?? should be just i/i+1
             mutate(i2);
+
+           // qDebug() << endl << "pop " << i << " is now " << newindsort[i] << ". we update " << i1 << endl;
+            //() << endl << "pop " << i+1 << " is now " << newindsort[i+1] << ". we update " << i2 << endl;
+            int parent1=newindsort[i1];
+            int parent2=newindsort[i2];
+            if(parent2<parent1){
+                int tmp=parent2;
+                parent2=parent1;
+                parent1=tmp;
+            }
+
+
+            qDebug() << "new individs" << i1 <<" and " <<i2 << " from " <<newindsort[i1]<< " and " << newindsort[i2] << endl;
+            population[0][i1].pID=(QString::number(currGeneration) + "_" + QString::number(i1) + "_" + QString::number(newindsort[i1]) + "+" + QString::number(newindsort[i2]));
+            population[0][i2].pID=(QString::number(currGeneration) + "_" + QString::number(i2) + "_" + QString::number(newindsort[i1]) + "+" + QString::number(newindsort[i2]));
+            parents[i1].first=parent1;
+            parents[i1].second=parent2;
+            parents[i2].first=parent1;
+            parents[i2].second=parent2;
+
             /*
                  * feed the ml with the data here
                  * create a ml-object?
@@ -357,7 +405,7 @@ void igacado::nextGeneration(){
                  *
                  */
 
-        }while(false); //insert the Machine learning here? so if the ml think the new page is bad it will create a new pace insead.
+        }while(false); //insert the Machine learning here? so if the ml think the new page is bad it will create a new page instead.
     }
     //qDebug() << "ge6" << population[0][1].mBentoTree->mRootBlock->mChildren.size()<< " : " <<population[0][1].mBentoTree->mRootBlock->mChildren.size() << endl;
 
@@ -401,10 +449,12 @@ void igacado::nextGeneration(){
    }
     for(int i=0;i<elitesindex.size();i++){
         int index=islandPop[i]+islandPopSize[i]-1;
-        qDebug() << "pop" << islandPop[i] << "+" << islandPopSize[i]<< "=" << index << endl;
+        //qDebug() << "pop" << islandPop[i] << "+" << islandPopSize[i]<< "=" << index << endl;
         //population[0][elitesindex[0]+popSize()].mColor[1].setRgb(255,0,255,200);
         population[0][index].updatePage(population[0][elitesindex[i]+popSize()]);
-
+        population[0][index].pID = QString::number(currGeneration) + "_E" + QString::number(i) + "_" + QString::number(elitesindex[i]);
+        parents[index].first=elitesindex[i];
+        parents[index].second=-1;
 
     }
 //    int i=1;
@@ -473,12 +523,12 @@ void igacado::crossOverBasic(bricolage::Page* mPage1,bricolage::Page* mPage2/*,b
 
 
  //   foreach(QString key,keys){
-
+    qDebug() << endl << currGeneration << endl;
     foreach(QString key, keysEvol){
 
 
         if(pRand(BasicCrossProbaKey) && (keysPage1.contains(key) || keysPage2.contains(key))){
-            qDebug() << "nananaaaaa basic cross thing";
+            qDebug() << key << " - basic cross thing" ;
             if (keysPage1.contains(key) && !keysPage2.contains(key)){ //If key only exist in one, copy to the other.
                  mPage2->ComputedStyleList[key]=mPage1->ComputedStyleList[key];
             }else if(!keysPage1.contains(key) && keysPage2.contains(key)){
@@ -488,8 +538,10 @@ void igacado::crossOverBasic(bricolage::Page* mPage1,bricolage::Page* mPage2/*,b
                 QVector<QString> list2=mPage2->ComputedStyleList[key];
                 int s1 = list1.size();
                 int s2 = list2.size();
-                if(s1<2 && s2<2){ //if short, just swap whole list. "==1"
-                    if(pRand(BasicCrossKeepLengthProb) || s1==s2){
+                if((s1<2 && s2<2) || pRand(0.5)){ //if short, just swap whole list. "==1"  //Todo: Add parameter for keylevelCrossover
+                    qDebug() << "- swap whole:" << s1 << "-" << s2 << "-";
+                    if(!pRand(BasicCrossKeepLengthProb) || s1==s2){
+                        qDebug() << "yes" << endl;
                         mPage1->ComputedStyleList[key]=list2;
                         mPage2->ComputedStyleList[key]=list1;
                     }
@@ -506,6 +558,7 @@ void igacado::crossOverBasic(bricolage::Page* mPage1,bricolage::Page* mPage2/*,b
                         len1= qrand()%(s1-p1start);
                         len2= qrand()%(s2-p2start);
                     }
+
                     QVector<QString> list1n=list1.mid(0,p1start) + list2.mid(p2start,len2) + list1.mid(p1start+len1);
                     QVector<QString> list2n=list2.mid(0,p2start) + list1.mid(p1start,len1) + list2.mid(p2start+len2);
                     qSort(list1n.begin(),list1n.end(),letssThan);
@@ -533,7 +586,7 @@ void igacado::crossOverBasic(bricolage::Page* mPage1,bricolage::Page* mPage2/*,b
 // calls mutate color and mutate the other stuff
 //#####################################################################
 void igacado::mutate(int i){
-    mutateElementColor(&population[0][i]);
+    mutateElementColor(&population[0][i]);  //does it matter if this is here or end of this function?
 
     if(evolveType[0].first>0) mutateColor(i);
     QStringList keysEvol = getEvolKeys();
@@ -609,8 +662,7 @@ void igacado::mutateNumeric(bricolage::Page* mPage, QString key, int unicorn){
 // Function MutateColor
 // Mutates the color pallet
 //#####################################################################
-void igacado::mutateColor(int i){ //not only color, use for everything!
-
+void igacado::mutateColor(int i){
     if(pRand(ColorRot)){
         double cMDiff = (1-fitnessList[i]);
         //Todo: change all these to gaussian!!
@@ -694,10 +746,11 @@ void igacado::mutateElementColor(bricolage::Page *mpage, bricolage::BentoBlock* 
     //Todo, add for other than color
     //I thougt this is done before.. but cant find it????
     QStringList keys=getEvolKeys();
+    double gaussFactor=gaussian(bentoBlock->mLevel);
     foreach (QString key, keys) {//This doesnt work....
-        if(pRand(swapPropa)){
-            int size= mpage->ComputedStyleList[key].size();
-            if(bentoBlock->mComputedStyles.contains(key)){
+        if(bentoBlock->mComputedStyles.contains(key)){
+            if(pRand(swapPropa*gaussFactor)){ // todo, change the name to mutateelement or something
+                int size= mpage->ComputedStyleList[key].size();
                 //qDebug() << "index before" <<bentoBlock->mComputedStyles[key].first << "size acc to old " << bentoBlock->mComputedStyles[key].second<< "real size" << size << endl;
                 bentoBlock->mComputedStyles[key].first= qrand()%size;
             }
@@ -723,7 +776,7 @@ void igacado::mutateElementColor(bricolage::Page *mpage, bricolage::BentoBlock* 
             newColor(&mpage->mColor);
             ColorSize++;
         }else{
-            double gaussFactor=gaussian(bentoBlock->mLevel);
+
             if(pRand(mRateCE_t*gaussFactor)) bentoBlock->moutlineColor=(qrand() % (ColorSize-1))+1; //-1))+1, we dont want text to be tranparant
             if(pRand(mRateCE_t*gaussFactor)) bentoBlock->mlinkColor=((qrand()+1) % (ColorSize-1))+1;  //gives error if colorsize 1, but should be impossible to be?
             if(pRand(mRateCE_t*gaussFactor)) bentoBlock->mborderColor=((qrand()+2) % (ColorSize-1))+1;

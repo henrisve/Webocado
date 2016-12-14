@@ -1,6 +1,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QTimer>
+#include <QDateTime>
 //#include "CutyCapt.cpp"
 #include "igamain.h"
 //#include "igamain.cpp"
@@ -23,6 +24,7 @@ QTime myTimer;
 // Function on_pushButton_clicked()
 //#####################################################################
 void Window::on_pushButton_clicked(){
+
     //Make it possible to get event from click on webwidget
 
     for(int i=0;i<10000000;i++){
@@ -73,6 +75,12 @@ void Window::on_pushButton_clicked(){
     pageId.clear();
     isButtonClicked=true;
 
+    //For ancestry tree
+    dateTime = QDateTime::currentDateTime().toString("MMddhhmms");
+    QString path=QDir::currentPath() + "/img" + dateTime;
+    QDir dir = QDir::root();
+    dir.mkpath(path);
+    initAncestryTree();
 
 
 
@@ -188,7 +196,7 @@ void Window::on_timer_finished() {
         //QUrl oldurl= url;
         url=webPageVector[i]->mainFrame()->baseUrl();
         //if(oldurl!=url) pageid++;
-        population.append(*new Page(*webPageVector[i],pageId[i],url.toString()));
+        population.append(*new Page(*webPageVector[i],pageId[i],url.toString(),i));
     }
 
     qDebug() << endl << "Done!, now create the copyareas: ";
@@ -323,7 +331,7 @@ void Window::popBuildColorList() {
 }
 void Window::buildColorList(Page *mPage) {
     //mPage->ComputedStyleList.clear();
-    if(pRand()){
+    if(pRand()){ //Todo:add parameter for this on the gui
         mPage->mColor.clear();
     }
     if(mPage->mColor.empty()){
@@ -473,8 +481,6 @@ void Window::updateColor(BentoBlock *bentoBlock,QVector<QColor>* colorList) {
 //    setEnabled(true);
 //}
 void Window::on_button_dislike_clicked(){
-
-
     button_vote(false);
 }
 
@@ -483,21 +489,48 @@ void bricolage::Window::on_button_like_clicked(){
 }
 
 void Window::button_vote(bool liked){
-
+    if(runFlag) return;
+    runFlag =true;
+    //First we save new image
 
     qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
+    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+    QPixmap imgtmp;
+    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+    imgtmp = QPixmap::grabWindow(mainWeb_1->winId());
+    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+    imgtmp.scaledToWidth(200);
+    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+    //scale this image later, no need to save full size
+    QString path=QDir::currentPath() + "/img" + dateTime + "/" + igaObject->getCurrIName() + ".png";
+    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+    if(!imgtmp.save(path)){
+        qDebug() << "could not save file" << path;
+    }
+
+    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+
+
+
+
     mainWeb_1->setPage(nineNumberPage[0]);
     setEnabled(false);
     QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
     qDebug()<<"new Vote! Time" << myTimer.elapsed() << endl;
     double fitness = (1+exp(-double(myTimer.elapsed())/S_TimeFitness->value()));
     fitness = liked ? fitness/2 : (1/fitness)-0.5;
-    igaObject->nextIndividual(fitness);
+
     //mainTabWidget->setCurrentIndex(igaObject->currIndividial);
 
+    if(igaObject->currIndividial==igaObject->popSize()-1){ //both this and next is always true at the same time.
+        addToAncestryTree();
 
+    }
+    igaObject->nextIndividual(fitness);
     if(igaObject->currIndividial==0){
-                int t=myTimer.elapsed();
+
+        addNewGenAncestryTree();
+        //int t=myTimer.elapsed();
         //qDebug() << "new gen update colors:" << endl << myTimer.elapsed()-t;
         popUpdateColor();
                 //qDebug() << "popUpdateColor();" << endl << myTimer.elapsed()-t;
@@ -506,6 +539,7 @@ void Window::button_vote(bool liked){
         updateColorTable();
                 //qDebug() << "updateColorTable();" << endl << myTimer.elapsed()-t;
     }
+
 
     //adds visible text of the stylelist to gui
     StyleListTextboxOld->clear();
@@ -525,22 +559,18 @@ void Window::button_vote(bool liked){
 
     qDebug() << "Done, your turn!" << endl;
 
-    myTimer.start();
-    //
+    myTimer.start();//Start timer for next round
 
     htmlView->document()->setPlainText(population[igaObject->currIndividial].getHtml());
     treeWidget->clear();
     examineChildElements(population[igaObject->currIndividial].mBentoTree->mRootBlock, treeWidget->invisibleRootItem());
 
 
-
-    //Start timer for next round
-
-
     qApp->restoreOverrideCursor();
     setEnabled(true);
-    qDebug() << "V3" << "p0:" << population[0].ComputedStyleList["height"].size() << "p1:" << population[1].ComputedStyleList["height"].size()<<endl;
+    //qDebug() << "V3" << "p0:" << population[0].ComputedStyleList["height"].size() << "p1:" << population[1].ComputedStyleList["height"].size()<<endl;
     QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+    runFlag=false;
 }
  //Todo, very slow!!
 void Window::updateColorTable(){
@@ -561,7 +591,7 @@ void Window::updateColorTable(){
     }
 }
 
-////Remove!1
+//now this is an important thing, change name!
 void Window::testtest(Page *mpage, BentoBlock* bentoBlock){
     bentoBlock->mDomNodeID=-1; //TODO, migth be a problem?
 
@@ -584,7 +614,7 @@ bool Window::eventFilter(QObject *object, QEvent *event){
 
         QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
 
-        qDebug()<<"woop1";
+        //qDebug()<<"woop1";
         Web9_1->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_1->setPage(nineNumberPage[nineCounter]);
@@ -594,7 +624,7 @@ bool Window::eventFilter(QObject *object, QEvent *event){
     }
     if (object == Web9_2 && event->type() == QEvent::MouseButtonPress) {
         QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
-        qDebug()<<"woop2";
+        //qDebug()<<"woop2";
         Web9_2->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_2->setPage(nineNumberPage[nineCounter]);
@@ -604,7 +634,7 @@ bool Window::eventFilter(QObject *object, QEvent *event){
     }
     if (object == Web9_3 && event->type() == QEvent::MouseButtonPress) {
         QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
-        qDebug()<<"woop3";
+        //qDebug()<<"woop3";
         Web9_3->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_3->setPage(nineNumberPage[nineCounter]);
@@ -614,7 +644,7 @@ bool Window::eventFilter(QObject *object, QEvent *event){
     }
     if (object == Web9_4 && event->type() == QEvent::MouseButtonPress) {
         QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
-        qDebug()<<"woop4";
+        //qDebug()<<"woop4";
         Web9_4->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_4->setPage(nineNumberPage[nineCounter]);
@@ -624,7 +654,7 @@ bool Window::eventFilter(QObject *object, QEvent *event){
     }
     if (object == Web9_5 && event->type() == QEvent::MouseButtonPress) {
         QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
-        qDebug()<<"woop5";
+        //qDebug()<<"woop5";
         Web9_5->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_5->setPage(nineNumberPage[nineCounter]);
@@ -634,7 +664,7 @@ bool Window::eventFilter(QObject *object, QEvent *event){
     }
     if (object == Web9_6 && event->type() == QEvent::MouseButtonPress) {
         QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
-        qDebug()<<"woop6";
+        //qDebug()<<"woop6";
         Web9_6->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_6->setPage(nineNumberPage[nineCounter]);
@@ -644,7 +674,7 @@ bool Window::eventFilter(QObject *object, QEvent *event){
     }
     if (object == Web9_7 && event->type() == QEvent::MouseButtonPress) {
         QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
-        qDebug()<<"woop7";
+        //qDebug()<<"woop7";
         Web9_7->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_7->setPage(nineNumberPage[nineCounter]);
@@ -654,7 +684,7 @@ bool Window::eventFilter(QObject *object, QEvent *event){
     }
     if (object == Web9_8 && event->type() == QEvent::MouseButtonPress) {
         QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
-        qDebug()<<"woop8";
+        //qDebug()<<"woop8";
         Web9_8->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_8->setPage(nineNumberPage[nineCounter]);
@@ -664,7 +694,7 @@ bool Window::eventFilter(QObject *object, QEvent *event){
     }
     if (object == Web9_9 && event->type() == QEvent::MouseButtonPress) {
         QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
-        qDebug()<<"woop9";
+        //qDebug()<<"woop9";
         Web9_9->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_9->setPage(nineNumberPage[nineCounter]);
@@ -730,7 +760,7 @@ void Window::nineNewClick(int id){
         }
         nineGenerateNew();
     }
-    qDebug()<< "ninecounter" << nineCounter << "fitsize" << nineFitness.size();
+    //qDebug()<< "ninecounter" << nineCounter << "fitsize" << nineFitness.size();
 
 }
 void Window::nineGenerateNew(){
@@ -835,8 +865,6 @@ bool Window::saveToIni(){
         foreach(QString key, numericLimits.keys()){
             stream << "numeric_Limits\t:\t"  <<key << ":" << numericLimits[key][0] << ":" << numericLimits[key][1]<<endl;
         }
-
-        //stream << "something" << endl;
     }
 }
 
@@ -902,42 +930,90 @@ void Window::closeEvent(QCloseEvent *event){
     }
 }
 
+void Window::initAncestryTree(){
+    QString header = "<!doctype html>\n<html lang=\"en\">"
+             "<head>\n<meta charset=\"utf-8\">\n<title>The HTML5 Herald</title>\n"
+             "<meta name=\"description\" content=\"The HTML5 Herald\">\n"
+             "<meta name=\"author\" content=\"SitePoint\">\n"
+             "</head>\n<body>\n</body>\n</html>";
+    AncetryTree.mainFrame()->setHtml(header);
 
-//class Window::fitnessSlider : public QSlider
-//{
-//    Q_OBJECT
-//protected:
-//    void mousePressEvent(QMouseEvent *event);// Q_DECL_OVERRIDE;
 
-//};
-//void fitnessSlider::mousePressEvent ( QMouseEvent * event ){
-//  QStyleOptionSlider opt;
-//  initStyleOption(&opt);
-//  QRect sr = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
 
-//  if (event->button() == Qt::LeftButton &&
-//      sr.contains(event->pos()) == false)
-//  {
-//    int newVal;
-//    double halfHandleWidth = (0.5 * sr.width()) + 0.5; // Correct rounding
-//    int adaptedPosX = event->x();
-//    if ( adaptedPosX < halfHandleWidth )
-//            adaptedPosX = halfHandleWidth;
-//    if ( adaptedPosX > width() - halfHandleWidth )
-//            adaptedPosX = width() - halfHandleWidth;
-//    // get new dimensions accounting for slider handle width
-//    double newWidth = (width() - halfHandleWidth) - halfHandleWidth;
-//    double normalizedPosition = (adaptedPosX - halfHandleWidth)  / newWidth ;
+    QFile file(QDir::currentPath() + "/img" + dateTime + "/webocado.html");
+    if (file.open(QIODevice::ReadWrite)) {
+        QTextStream stream(&file);
+        stream.flush();
+        stream << AncetryTree.mainFrame()->toHtml() << endl;
+    }
 
-//    newVal = minimum() + ((maximum()-minimum()) * normalizedPosition);
+}
 
-//    if (invertedAppearance() == true)
-//        setValue( maximum() - newVal );
-//    else
-//        setValue(newVal);
+void Window::addToAncestryTree(){
 
-//    qDebug() << newVal;
-//    event->accept();
-//  }
-//  QSlider::mousePressEvent(event);
-//}
+    int imgWidth = 1000/igaObject->popSize();
+    int barHigth = imgWidth>50?imgWidth:50;
+    QString barHigthstr = QString::number(barHigth);
+
+    QString newhtml="<div id=\"wrapper\">";
+    //" + QString::number(igaObject->getFitness(i))+ "
+    for(int i=0;i<igaObject->popSize();i++){
+        QString cname="myCanvas"+ QString::number(igaObject->getCurrGen()) + "a" +QString::number(i);
+        newhtml += "<div style=\"float:left;border:2px solid black\"><img src=\"" + igaObject->getCurrIName(i) + ".png\" style=\"width:"+QString::number(imgWidth-9)+"px;\">"
+                   "<canvas id=\""+ cname +"\" width=\"5\" height=\""+barHigthstr+"\"></canvas><script>var ca = document.getElementById('"+ cname +"');"
+                   "var ct = ca.getContext('2d');ct.beginPath();ct.rect(0, "+barHigthstr+",5, " + QString::number(-igaObject->getFitness(i)*barHigth)+ ")"
+                   ";ct.fillStyle = 'red';ct.fill();ct.stroke();</script></div>\n";
+    }
+    newhtml+= "</div>";
+    //QString newhtml = "<img src=\"" + igaObject->getCurrIName() + ".png\" style=\"width:"+QString::number(imgWidth-4)+"px;\">\n";
+    AncetryTree.mainFrame()->documentElement().lastChild().appendInside(newhtml);
+
+}
+
+void Window::addNewGenAncestryTree(){
+    int imgWidth = 1000/igaObject->popSize();
+
+    QString newhtml = "\n<br />\n<canvas id=\"myCanvas"+ QString::number(igaObject->getCurrGen()) +"\" height=\"100\" width=\"1000\">\n"
+                    "Your browser does not support the HTML5 canvas tag.</canvas>\n"
+                    "<script> \n"
+                    "var c = document.getElementById(\"myCanvas"+ QString::number(igaObject->getCurrGen()) +"\");\n"
+                    "var ctx = c.getContext(\"2d\");\n"
+                    "ctx.beginPath();\n";
+    for(int i=0;i<igaObject->popSize();i++){
+
+        if(igaObject->getParent(i,false)>=0){ //not elite
+            /*if(igaObject->getParent(i,true) == igaObject->getParent(i,false)){ //is same
+                newhtml += "ctx.moveTo(" + QString::number(((igaObject->getParent(i,true)+1) *imgWidth)-(imgWidth/2))+",0);\n"
+                            "ctx.lineTo(" + QString::number(((i+1)*imgWidth)-(imgWidth/2))+",100);\n"
+                            //"ctx.lineWidth=10;"
+                            "ctx.stroke();\n";
+            }else{*/
+                newhtml += "ctx.moveTo(" + QString::number(((igaObject->getParent(i,true)+1) *imgWidth)-(imgWidth*.2))+",0);\n"
+                            "ctx.lineTo(" + QString::number(((i+1)*imgWidth)-(imgWidth*.2))+",100);\n"
+                            "ctx.stroke();\n";
+                newhtml += "ctx.moveTo(" + QString::number(((igaObject->getParent(i,false)+1)*imgWidth)-(imgWidth*.8))+",0);\n"
+                            "ctx.lineTo(" + QString::number(((i+1)*imgWidth)-(imgWidth*.8))+",100);\n"
+                            "ctx.stroke();\n";
+            //}
+        }else{ //elite
+            newhtml += "ctx.moveTo(" + QString::number(((igaObject->getParent(i,true)+1) *imgWidth)-(imgWidth/2))+",0);\n"
+                        "ctx.lineTo(" + QString::number(((i+1)*imgWidth)-(imgWidth/2))+",100);\n"
+                        "ctx.stroke();\n";
+
+        }
+    }
+    newhtml+="</script>\n<br />\n";
+
+
+    AncetryTree.mainFrame()->documentElement().lastChild().appendInside(newhtml);
+
+
+
+    QFile file(QDir::currentPath() + "/img" + dateTime + "/webocado.html");
+    if (file.open(QIODevice::ReadWrite)) {
+        QTextStream stream(&file);
+        stream.flush();
+        stream << AncetryTree.mainFrame()->toHtml() << endl;
+    }
+    file.close();
+}

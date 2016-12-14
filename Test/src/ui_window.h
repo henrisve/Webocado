@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'window.ui'
 **
-** Created: Mon Oct 10 18:45:09 2016
+** Created: Tue Dec 13 01:35:21 2016
 **      by: Qt User Interface Compiler version 4.7.4
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -23,7 +23,6 @@
 #include <QtGui/QHeaderView>
 #include <QtGui/QLabel>
 #include <QtGui/QMainWindow>
-#include <QtGui/QMenuBar>
 #include <QtGui/QPlainTextEdit>
 #include <QtGui/QPushButton>
 #include <QtGui/QScrollArea>
@@ -84,7 +83,6 @@ public:
     QPlainTextEdit *webURLs;
     QTreeWidget *treeWidget2;
     QPushButton *pushButton;
-    QMenuBar *menubar;
     QStatusBar *statusbar;
     QDockWidget *dockWidget_4;
     QWidget *dockWidgetContents_4;
@@ -179,6 +177,9 @@ public:
         if (Window->objectName().isEmpty())
             Window->setObjectName(QString::fromUtf8("Window"));
         Window->resize(1677, 1273);
+        QIcon icon;
+        icon.addFile(QString::fromUtf8("../../../../../../Desktop/avocado.png"), QSize(), QIcon::Normal, QIcon::Off);
+        Window->setWindowIcon(icon);
         centralwidget = new QWidget(Window);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -454,10 +455,6 @@ public:
 
         dockWidget->setWidget(dockWidgetContents);
         Window->addDockWidget(static_cast<Qt::DockWidgetArea>(1), dockWidget);
-        menubar = new QMenuBar(Window);
-        menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 1677, 28));
-        Window->setMenuBar(menubar);
         statusbar = new QStatusBar(Window);
         statusbar->setObjectName(QString::fromUtf8("statusbar"));
         Window->setStatusBar(statusbar);
@@ -1093,7 +1090,7 @@ public:
 
     void retranslateUi(QMainWindow *Window)
     {
-        Window->setWindowTitle(QApplication::translate("Window", "Web Element DOM Traversal", 0, QApplication::UnicodeUTF8));
+        Window->setWindowTitle(QApplication::translate("Window", "Webocado", 0, QApplication::UnicodeUTF8));
         tabWidget_WeborHtml->setTabText(tabWidget_WeborHtml->indexOf(mainTab), QApplication::translate("Window", "Webpage", 0, QApplication::UnicodeUTF8));
         tabWidget_WeborHtml->setTabText(tabWidget_WeborHtml->indexOf(copyTab), QApplication::translate("Window", "HTML", 0, QApplication::UnicodeUTF8));
         tabWidget_WeborHtml->setTabText(tabWidget_WeborHtml->indexOf(tab_5), QApplication::translate("Window", "StyleList", 0, QApplication::UnicodeUTF8));

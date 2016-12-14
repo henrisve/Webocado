@@ -13,10 +13,11 @@ using namespace bricolage;
 //#####################################################################
 // Function Page
 //#####################################################################
-Page::Page(QWebPage& webPage, int pageID, QString url)
+Page::Page(QWebPage& webPage, int pageID, QString url,int ind)
 :mPageID(pageID),mURL(url),mBentoTree(new BentoTree())
 {
     //qDebug() << url;
+    pID = ("0_" + QString::number(ind));
     webpageP = &webPage;
     setDOMNodes(webPage.mainFrame()->documentElement());
     Bento bento;
@@ -102,9 +103,9 @@ void Page::copyPage(BentoBlock* copyBlock,BentoBlock* orgBlock){
 
 
 void Page::updateStyleList(BentoBlock* bentoBlock){
-    if(bentoBlock->mLevel==0 && bentoBlock->mChildren.size()==0){
-        qDebug() <<"fee";
-    }
+//    if(bentoBlock->mLevel==0 && bentoBlock->mChildren.size()==0){
+//        qDebug() <<"fee";
+//    }
     QHash<QString, QString> ComputedStyles = bentoBlock->getStyles();
     QList<QString> keys = ComputedStyles.keys();
     foreach (QString key, keys) {

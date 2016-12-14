@@ -27,7 +27,7 @@ class Window : public QMainWindow, private Ui::Window{
     Q_OBJECT
 
 private:
-
+    QString dateTime;
 	QWebElement mDocument;
     //Page* mPage;
     //QWebElement mDocument2;
@@ -65,6 +65,8 @@ private:
     QHash<int,double> nineFitness;
     int nineCounter=0;
     QVector<QWebPage*> nineNumberPage;
+
+    bool runFlag=false;
 	
 public:
     void init();
@@ -127,7 +129,7 @@ private slots:
 
         void on_button_like_clicked();
 
-        void on_fitnessSlider_sliderReleased();
+        //void on_fitnessSlider_sliderReleased();
 
 private:
     void testtest(bricolage::Page *mpage, bricolage::BentoBlock* bentoBlock); //remove!!!
@@ -156,6 +158,11 @@ private:
     void updateColor(BentoBlock *bentoBlock,QVector<QColor>* colorList);
     void updateColorTable();
     void addColor(int &colorBlock,QVector<QColor>* colorList, QColor newColor);
+
+    void initAncestryTree();
+    void addToAncestryTree();
+    void addNewGenAncestryTree();
+    QWebPage AncetryTree;
 
     //For 9 tiles thing
     //void nineNewClick(int id);

@@ -32,6 +32,25 @@ namespace webocado{
         int popSize(){
             return populationSize;
         }
+        QString getCurrIName(int ind){
+            return population[0][ind].pID;
+        }
+        QString getCurrIName(){
+            return population[0][currIndividial].pID; //For backward compability, remove later
+        }
+        int getCurrGen(){
+            return currGeneration;
+        }
+        int getParent(int targetID,bool first){
+            if(first){
+                return parents[targetID].first;
+            }else{
+                return parents[targetID].second;
+            }
+        }
+        double getFitness(int index){
+            return fitnessList[index];
+        }
 
 
 
@@ -65,6 +84,7 @@ namespace webocado{
             return (exp(-(r*r)/gaussSigma));
         }
 
+
         void mutateElementColor(bricolage::Page *mpage,bricolage::BentoBlock *bentoBlock, int ColorSize);
         inline void mutateElementColor(bricolage::Page *mpage){
             mutateElementColor(mpage, mpage->mBentoTree->mRootBlock, mpage->mColor.size());
@@ -76,6 +96,7 @@ namespace webocado{
         //privade variables
 
         int currGeneration;
+
         //private Parameters for iga settings
         double mRate;
         double cRate;
@@ -121,6 +142,7 @@ namespace webocado{
         QList<double> fitnessList;
         QList<bricolage::Page> *population;
         QList<QPair<double, QStringList> > evolveType;
+        QList<QPair<int, int> > parents; //contians int of each parents
 
         //            //For randomness:
 

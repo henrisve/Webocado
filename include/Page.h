@@ -23,13 +23,13 @@ class Page
 {
     
 public:
-    uint mPageID;
+    uint mPageID; //Used as IslandID.
     QString mURL;
     QList<QWebElement> mDOMNodes;
     BentoTree* mBentoTree;
     QVector<QColor> mColor;
-
     QHash<QString, QVector<QString> > ComputedStyleList;
+    QString pID; //uniqe id for each page, so we can track the pages.
 	
 public:
     inline bool pRand(double probability=0.5){ return (double)rand()/RAND_MAX < probability;}//Move to a common function file?
@@ -53,10 +53,13 @@ public:
     void printList(const QWebElement& domNode,int g_x);
 
     inline void updateStyleList(){
-        ComputedStyleList.clear();
+        if(pRand()){ //Todo: add parameter for this
+            ComputedStyleList.clear();
+        }
 
+        //need to be called twice due to things change
+        //during the first call.. Can probably be done in a nicer way.
         updateStyleList(mBentoTree->mRootBlock);
-        qDebug() << "UP2" << ComputedStyleList["height"].size() <<endl;
         updateStyleList(mBentoTree->mRootBlock);
     }
 
@@ -69,7 +72,7 @@ public:
     QString getHtml(){return webpageP->mainFrame()->toHtml();}
     int addStyles(QString styleValue, QString key);
 
-    Page(QWebPage& webPage=*new QWebPage, int pageID=0, QString url="");
+    Page(QWebPage& webPage=*new QWebPage, int pageID=0, QString url="", int ind=-1);
     ~Page() { delete mBentoTree; }
     QWebPage* webpageP;
 
