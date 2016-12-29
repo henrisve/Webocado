@@ -78,7 +78,7 @@ public:
 
     QList<Page> population; //private or public?
     webocado::igacado* igaObject = new webocado::igacado(/*0.2,0.2,5,0.7,2,10,1,&population*/);
-    inline bool pRand(double probability=0.5){ return (double)rand()/RAND_MAX < probability;}
+    inline bool pRand(double probability=0.5){ return (double)rand()/RAND_MAX < probability;} //<0 always false, >1 always true
 
     Window(QWidget *parent = 0):QMainWindow(parent){ 
 		setupUi(this); 
@@ -160,15 +160,25 @@ private:
     void addColor(int &colorBlock,QVector<QColor>* colorList, QColor newColor);
 
     void initAncestryTree();
-    void addToAncestryTree();
+    void addToAncestryTree(double f=0);
     void addNewGenAncestryTree();
     QWebPage AncetryTree;
+
+    void initHtmlDistance();
+    void addToHtmlDistance();
+    QWebPage htmlDistance;
 
     //For 9 tiles thing
     //void nineNewClick(int id);
     void nineGenerateNew();
 
-
+    struct QPairFirstComparer{
+        template<typename T1, typename T2>
+        bool operator()(const QPair<T1,T2> & a, const QPair<T1,T2> & b) const{
+            if(a.first == b.first) return a.second < b.second;
+            return a.first < b.first;
+        }
+    };
 //#####################################################################
 };
 

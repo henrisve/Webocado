@@ -81,18 +81,21 @@ void Window::on_pushButton_clicked(){
     QDir dir = QDir::root();
     dir.mkpath(path);
     initAncestryTree();
+    initHtmlDistance();
 
 
-
+    QString pathw=QDir::currentPath() + "/webpages/";
+    dir = QDir::root();
+    dir.mkpath(pathw);
     for(int i=0; i<webURLlist.size();i++){
         QString temp=webURLlist.at(i);
         if(temp.contains("http",Qt::CaseInsensitive)) continue;
         if(temp.contains("www",Qt::CaseInsensitive)){
             webURLlist[i]=("http://" + temp);
         }else if(temp.endsWith(".html",Qt::CaseInsensitive)){
-            webURLlist[i]= ("/home/lox/Dropbox/Skola/Master-Thesis/Websites/" + temp);
+            webURLlist[i]= pathw + temp;
         }else if(!temp.contains(".")){
-            webURLlist[i]= ("/home/lox/Dropbox/Skola/Master-Thesis/Websites/" + temp + ".html");
+            webURLlist[i]= (pathw + temp + ".html");
         }else{
             webURLlist[i]=("http://www." + temp);
         }
@@ -134,6 +137,9 @@ void Window::on_pushButton_clicked(){
         webPageVector.append(new QWebPage);
         webPageVector.last()->setNetworkAccessManager(managerVector[0]);
         webPageVector.last()->mainFrame()->setUrl(QUrl(webURLlist[urlIndex]));
+        webPageVector.last()->mainFrame()->setScrollBarPolicy( Qt::Horizontal, Qt::ScrollBarAlwaysOff );
+        webPageVector.last()->mainFrame()->setScrollBarPolicy( Qt::Vertical, Qt::ScrollBarAlwaysOff );
+        webPageVector.last()->setViewportSize(QSize(1000,1000));
         pageId.append(urlIndex);
     }
 
@@ -195,8 +201,11 @@ void Window::on_timer_finished() {
         qDebug() << i;
         //QUrl oldurl= url;
         url=webPageVector[i]->mainFrame()->baseUrl();
+        webPageVector[i]->mainFrame()->setScrollBarPolicy( Qt::Horizontal, Qt::ScrollBarAlwaysOff );
+        webPageVector[i]->mainFrame()->setScrollBarPolicy( Qt::Vertical, Qt::ScrollBarAlwaysOff );
+        webPageVector[i]->setViewportSize(QSize(1000,1000));
         //if(oldurl!=url) pageid++;
-        population.append(*new Page(*webPageVector[i],pageId[i],url.toString(),i));
+        population.append(*new Page(*webPageVector[i],pageId[i],url.toString(),i,dateTime));
     }
 
     qDebug() << endl << "Done!, now create the copyareas: ";
@@ -223,7 +232,7 @@ void Window::on_timer_finished() {
     //    qDebug()<< endl << "-----------------------------------------------------------------------------------" <<endl;
 
 
-    for(int i=0;i<population.size();i++){
+    for(int i=0;i<population.size();i++){ //this also take the copy part:/
         testtest(&population[i],population[i].mBentoTree->mRootBlock); //important function that deserve a real name
     }
 
@@ -251,7 +260,7 @@ void Window::on_timer_finished() {
     igaObject->initIgacado(&settings,&numericLimits,S_PopSize->value(),&population);
     qDebug() << "Done, mutate first generation" << endl;
     popUpdateColor();
-    igaObject->mutate();
+    //igaObject->mutateFirst();
     qDebug() << "Done, create style lists" << endl;
 
     //in some cases we need to do this?
@@ -275,8 +284,9 @@ void Window::on_timer_finished() {
         Web9_7->installEventFilter(this);
         Web9_8->installEventFilter(this);
         Web9_9->installEventFilter(this);
-
-
+        for(int i=0;i<igaObject->popSize();i++){
+            population[i].mBentoTree->mRootBlock->mDOMNode.webFrame()->setZoomFactor(0.5);
+        }
         for(int i=0;i<9;i++){
             nineNumberPage.append(new QWebPage);
             nineNumberPage[i]->mainFrame()->setHtml("<p style=\"font-size:50px\">"+QString::number(i)+"</p>");
@@ -323,13 +333,18 @@ void Window::examineChildElements(const BentoBlock* bentoBlock, QTreeWidgetItem*
 // main mcolor all the ones under change too
 //#####################################################################
 void Window::popBuildColorList() {
-    for(int i=0;i<population.size()/2;i++){ //change to popsize
-        population[i].updateStyleList();
-        buildColorList(&population[i]);
-        //QList<QString> keys = population[i].ComputedStyleList.keys();
-    }
+    //for(int i=0;i<population.size()/2;i++){ //change to popsize
+       //population[i].updateStyleList();
+       //population[i].buildColorList();
+    //}
 }
-void Window::buildColorList(Page *mPage) {
+void Window::popUpdateColor() {
+    //for(int i=0;i<population.size()/2;i++){
+      //population[i].updateColor();
+      //population[i].updateStyles();
+    //}
+}
+/*void Window::buildColorList(Page *mPage) {                    // MOVED TO PAGE.CPP
     //mPage->ComputedStyleList.clear();
     if(pRand()){ //Todo:add parameter for this on the gui
         mPage->mColor.clear();
@@ -340,20 +355,20 @@ void Window::buildColorList(Page *mPage) {
         mPage->mColor.append(tranp);
     }
     buildColorList(mPage->mBentoTree->mRootBlock,&mPage->mColor);
-}
+}*/
 
 
+/*
+void Window::buildColorList(BentoBlock *bentoBlock,QVector<QColor>* colorList){ //Move to bentoblock?
+    // These could be inserted later, but not really important?
+    //"border-right-color"
+    //"border-top-color"
+    //"text-line-through-color"
+    //"text-overline-color"
+    //"text-underline-color"
+    //"border-left-color"
+    //"border-bottom-color"
 
-void Window::buildColorList(BentoBlock *bentoBlock,QVector<QColor>* colorList){
-    /* These could be inserted later, but not really important?
-    "border-right-color"
-    "border-top-color"
-    "text-line-through-color"
-    "text-overline-color"
-    "text-underline-color"
-    "border-left-color"
-    "border-bottom-color"
-    */
 
     //under this is the old, keep until it works
 
@@ -373,10 +388,10 @@ void Window::buildColorList(BentoBlock *bentoBlock,QVector<QColor>* colorList){
     for(int i=0; i<bentoBlock->mChildren.size(); i++) {
         buildColorList(bentoBlock->mChildren[i],colorList);
     }
-}
+}*/
 
-//This should be in the bentoblock file! haha. FML
-void Window::addColor(int &colorBlock,QVector<QColor>* colorList, QColor newColor){
+//This should be in the bentoblock file!
+/*void Window::addColor(int &colorBlock,QVector<QColor>* colorList, QColor newColor){
     if(newColor.alpha()==0){
         colorBlock=0;
     }
@@ -387,15 +402,14 @@ void Window::addColor(int &colorBlock,QVector<QColor>* colorList, QColor newColo
     }else{
         colorBlock=index;//&temp->back();
     }
-}
-
+}*/
 
 //#####################################################################
 // Function colorIndex
 // Return the index of the color of a list.
 // returns -1 if not found
 //#####################################################################
-int Window::colorIndex(QVector<QColor>* colorList, QColor color){
+/*int Window::colorIndex(QVector<QColor>* colorList, QColor color){
     int index=-1;
 
     for(uint i=0;i<colorList->size();i++){
@@ -405,15 +419,10 @@ int Window::colorIndex(QVector<QColor>* colorList, QColor color){
         }
     }
     return index;
-}
+}*/
 
-void Window::popUpdateColor() {
-    for(int i=0;i<population.size()/2;i++){
-        updateColor(population[i].mBentoTree->mRootBlock,&population[i].mColor);
-        population[i].updateStyles();
-    }
-}
-void Window::updateColor(BentoBlock *bentoBlock,QVector<QColor>* colorList) {
+
+/*void Window::updateColor(BentoBlock *bentoBlock,QVector<QColor>* colorList) {
     //    bentoBlock->mDOMNode.classes();
 
     //TODOCOLOR
@@ -453,7 +462,7 @@ void Window::updateColor(BentoBlock *bentoBlock,QVector<QColor>* colorList) {
     for (int i=0; i<bentoBlock->mChildren.size(); i++) {
         updateColor(bentoBlock->mChildren[i],colorList);
     }
-}
+}*/
 
 
 
@@ -489,60 +498,34 @@ void bricolage::Window::on_button_like_clicked(){
 }
 
 void Window::button_vote(bool liked){
+    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
     if(runFlag) return;
     runFlag =true;
-    //First we save new image
-
     qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
-    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-    QPixmap imgtmp;
-    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-    imgtmp = QPixmap::grabWindow(mainWeb_1->winId());
-    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-    imgtmp.scaledToWidth(200);
-    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-    //scale this image later, no need to save full size
-    QString path=QDir::currentPath() + "/img" + dateTime + "/" + igaObject->getCurrIName() + ".png";
-    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-    if(!imgtmp.save(path)){
-        qDebug() << "could not save file" << path;
-    }
-
-    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-
-
-
-
     mainWeb_1->setPage(nineNumberPage[0]);
     setEnabled(false);
     QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
     qDebug()<<"new Vote! Time" << myTimer.elapsed() << endl;
     double fitness = (1+exp(-double(myTimer.elapsed())/S_TimeFitness->value()));
     fitness = liked ? fitness/2 : (1/fitness)-0.5;
-
-    //mainTabWidget->setCurrentIndex(igaObject->currIndividial);
-
     if(igaObject->currIndividial==igaObject->popSize()-1){ //both this and next is always true at the same time.
-        addToAncestryTree();
-
+        addToAncestryTree(fitness);
     }
     igaObject->nextIndividual(fitness);
     if(igaObject->currIndividial==0){
-
         addNewGenAncestryTree();
+        addToHtmlDistance();
         //int t=myTimer.elapsed();
         //qDebug() << "new gen update colors:" << endl << myTimer.elapsed()-t;
-        popUpdateColor();
+        //popUpdateColor();
                 //qDebug() << "popUpdateColor();" << endl << myTimer.elapsed()-t;
-        popBuildColorList();
+        //popBuildColorList();
                 //qDebug() << "popBuildColorList()" << endl << myTimer.elapsed()-t;
         updateColorTable();
                 //qDebug() << "updateColorTable();" << endl << myTimer.elapsed()-t;
     }
-
-
     //adds visible text of the stylelist to gui
-    StyleListTextboxOld->clear();
+    StyleListTextboxOld->clear(); //todo, first plan was old should be prev. generation.. probably not that important..
     StyleListTextboxOld->insertPlainText(StyleListTextbox->toPlainText());
     StyleListTextbox->clear();
     QList<QString> keys =population[igaObject->currIndividial].ComputedStyleList.keys();
@@ -591,7 +574,8 @@ void Window::updateColorTable(){
     }
 }
 
-//now this is an important thing, change name!
+//now this is an important thing, change name! also, move to page.cpp
+//Sorts up the domnodes or something...
 void Window::testtest(Page *mpage, BentoBlock* bentoBlock){
     bentoBlock->mDomNodeID=-1; //TODO, migth be a problem?
 
@@ -610,96 +594,98 @@ void Window::testtest(Page *mpage, BentoBlock* bentoBlock){
 }
 
 bool Window::eventFilter(QObject *object, QEvent *event){
+    if(runFlag) return false; //true=ignore it, i.e
+    runFlag =true;
     if (object == Web9_1 && event->type() == QEvent::MouseButtonPress) {
 
         QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
 
         //qDebug()<<"woop1";
-        Web9_1->setZoomFactor(1);
+        //Web9_1->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_1->setPage(nineNumberPage[nineCounter]);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        Web9_1->setZoomFactor(1);
+        //Web9_1->setZoomFactor(1);
         nineNewClick(nineList[0]);
     }
     if (object == Web9_2 && event->type() == QEvent::MouseButtonPress) {
         QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
         //qDebug()<<"woop2";
-        Web9_2->setZoomFactor(1);
+        //Web9_2->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_2->setPage(nineNumberPage[nineCounter]);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        Web9_2->setZoomFactor(1);
+        //Web9_2->setZoomFactor(1);
         nineNewClick(nineList[1]);
     }
     if (object == Web9_3 && event->type() == QEvent::MouseButtonPress) {
         QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
         //qDebug()<<"woop3";
-        Web9_3->setZoomFactor(1);
+        //Web9_3->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_3->setPage(nineNumberPage[nineCounter]);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        Web9_3->setZoomFactor(1);
+        //Web9_3->setZoomFactor(1);
         nineNewClick(nineList[2]);
     }
     if (object == Web9_4 && event->type() == QEvent::MouseButtonPress) {
         QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
         //qDebug()<<"woop4";
-        Web9_4->setZoomFactor(1);
+        //Web9_4->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_4->setPage(nineNumberPage[nineCounter]);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        Web9_4->setZoomFactor(1);
+        //Web9_4->setZoomFactor(1);
         nineNewClick(nineList[3]);
     }
     if (object == Web9_5 && event->type() == QEvent::MouseButtonPress) {
         QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
         //qDebug()<<"woop5";
-        Web9_5->setZoomFactor(1);
+        //Web9_5->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_5->setPage(nineNumberPage[nineCounter]);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        Web9_5->setZoomFactor(1);
+        //Web9_5->setZoomFactor(1);
         nineNewClick(nineList[4]);
     }
     if (object == Web9_6 && event->type() == QEvent::MouseButtonPress) {
         QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
         //qDebug()<<"woop6";
-        Web9_6->setZoomFactor(1);
+        //Web9_6->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_6->setPage(nineNumberPage[nineCounter]);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        Web9_6->setZoomFactor(1);
+        //Web9_6->setZoomFactor(1);
         nineNewClick(nineList[5]);
     }
     if (object == Web9_7 && event->type() == QEvent::MouseButtonPress) {
         QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
         //qDebug()<<"woop7";
-        Web9_7->setZoomFactor(1);
+        //Web9_7->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_7->setPage(nineNumberPage[nineCounter]);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        Web9_7->setZoomFactor(1);
+        //Web9_7->setZoomFactor(1);
         nineNewClick(nineList[6]);
     }
     if (object == Web9_8 && event->type() == QEvent::MouseButtonPress) {
         QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
         //qDebug()<<"woop8";
-        Web9_8->setZoomFactor(1);
+        //Web9_8->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_8->setPage(nineNumberPage[nineCounter]);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        Web9_8->setZoomFactor(1);
+        //Web9_8->setZoomFactor(1);
         nineNewClick(nineList[7]);
     }
     if (object == Web9_9 && event->type() == QEvent::MouseButtonPress) {
         QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
         //qDebug()<<"woop9";
-        Web9_9->setZoomFactor(1);
+        //Web9_9->setZoomFactor(1);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         Web9_9->setPage(nineNumberPage[nineCounter]);
         QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        Web9_9->setZoomFactor(1);
+        //Web9_9->setZoomFactor(1);
         nineNewClick(nineList[8]);
     }
     if (object == fitnessSlider && event->type() == QEvent::MouseButtonRelease) {
@@ -708,11 +694,16 @@ bool Window::eventFilter(QObject *object, QEvent *event){
         fitnessSlider->setValue(newval);
         qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
         setEnabled(false);
+        if(igaObject->currIndividial==igaObject->popSize()-1){ //both this and next is always true at the same time.
+            addToAncestryTree(newval);
+        }
         igaObject->nextIndividual(newval);
         if(igaObject->currIndividial==0){
             qDebug() << "new gen update colors:" << endl;
-            popUpdateColor();
-            popBuildColorList();
+            addNewGenAncestryTree();
+            addToHtmlDistance();
+            //popUpdateColor();
+            //popBuildColorList();
             updateColorTable();
         }
         mainWeb_1->setPage(population[igaObject->currIndividial].webpageP);
@@ -727,34 +718,70 @@ bool Window::eventFilter(QObject *object, QEvent *event){
         event->ignore();
     }
     // The event will be correctly sent to the widget
+    runFlag =false;
+
     return false;
     // If you want to stop the event propagation now:
     // return true
-}
-void Window::nineNewClick(int id){
-    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
 
+}
+void Window::nineNewClick(int id){ //id=popid, todo: change varname
+    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
     nineCounter++;
-    if(nineFitness.contains(id)){
-        nineFitness[id]=(nineFitness[id]+1-(double(nineCounter)/10))/2;
-    }else{
-        nineFitness[id]=1-(double(nineCounter)/10);
+    int noOfNN=0;
+    qDebug()<<"you choose " << id << ", the following got new score: ";
+    for(int i=0;i<igaObject->popSize();i++){
+        double fitness=population[id].distanceMulti[i];
+        if(fitness!=1) fitness-=0.2; //-0.2, even if very similar, we dont want unselected to get approx the same value as those selected
+        if(pRand(fitness)){//fitness>qrand()){
+            noOfNN++;
+            if(nineFitness.contains(i)){
+                nineFitness[i]=(nineFitness[i]+fitness)/2;//(nineFitness[i]*(2-fitness)+fitness)/2;
+            }else{
+                nineFitness[i]=fitness;
+            }
+            qDebug() << i << "now have " << nineFitness[i] <<" new:(" << fitness << ")";
+        }
     }
-    qDebug()<<"this fitness was" << nineCounter << ". new score for" << id <<"is"<<nineFitness[id]<<endl;
-    if(nineCounter>=9){
+    qDebug() << " (" << noOfNN << " nn)";
+    if(nineCounter>=1){//before I used to select all 9 in order, now just one, the rest is considered to be bad.
+        qDebug() << endl << "the individs not selected got 0";
+        for(int i=0;i<9;i++){
+            if(!nineFitness.contains(nineList[i])){
+                nineFitness[nineList[i]]=0;
+            }else{
+                nineFitness[nineList[i]]/=2;
+            }
+            qDebug() << " : "<< i << "now have" << nineFitness[nineList[i]] ;
+        }
+        qDebug() << endl << nineFitness.size() << "out of" << igaObject->popSize() << "is selected" << endl;
         nineCounter=0;
         if(nineFitness.size()>=igaObject->popSize()){
             qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
             setEnabled(false);
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+            for(int i=0;i<igaObject->popSize();i++){
+                population[i].mBentoTree->mRootBlock->mDOMNode.webFrame()->setZoomFactor(1);
+                QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+            }
             //send all to next generation. for now loop next individual
+            addToAncestryTree();
             for(int i=0;i<nineFitness.size();i++){
                 igaObject->nextIndividual(nineFitness[i]);
+                QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
             }
+            addNewGenAncestryTree();
+            addToHtmlDistance();
             qDebug()<<"new generation" << endl;
-            popUpdateColor();
-            popBuildColorList();
+            //popUpdateColor();
+            //popBuildColorList();
             updateColorTable();
             nineFitness.clear();
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+            for(int i=0;i<igaObject->popSize();i++){
+                population[i].mBentoTree->mRootBlock->mDOMNode.webFrame()->setZoomFactor(0.5);
+                QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+            }
             qApp->restoreOverrideCursor();
             setEnabled(true);
         }
@@ -765,19 +792,64 @@ void Window::nineNewClick(int id){
 }
 void Window::nineGenerateNew(){
     nineList.clear();
-    for(int i = 0; i < 9; ++i){
+    for(int i = 0; i < 9; i++){
         int r;
-        int e=0;
-        do{
-            e++;
-            r = rand()%(int)igaObject->popSize();
-            //qDebug()<<"no"<<i<<"try:"<<e<<"value"<<r << endl;
-            if(nineFitness.contains(r) && pRand()) continue;
-        }while(nineList.contains(r));
+        double maxfit;
+        bool noSame;
+        bool preferNear;
+        bool preferNew;
+        do{//while()
+            do{r = rand()%(int)igaObject->popSize();}while(nineList.contains(r)); //get unique r
+            maxfit=0;
+            for(int j=0;j<i;j++){
+                double fitness=population[r].distanceMulti[nineList[j]];
 
+                if(fitness>maxfit){
+                    maxfit=fitness;
+                }
+            }
+            noSame = maxfit==1 && pRand(0.95);
+            preferNear = pRand(1-maxfit) && pRand(0.95);
+            preferNew = nineFitness.contains(r) && pRand();
+            if(maxfit==1){
+                qDebug() << endl << r << " exact copy exist in the 9";
+                if(noSame) qDebug() << "but ok this time";
+            }
+            if(preferNear)
+                qDebug() <<endl << "with a value of" << maxfit << "," << r << "was too close this time";
+            if(preferNew)
+                qDebug() << endl << r << " was selected before, 50% chance of be picked, so no luck this time";
+        }while(noSame || preferNear || preferNew);//(maxfit==1 && pRand(0.95)) || pRand(0.55-(maxfit/2) || nineFitness.contains(r) && pRand()));
+        //If maxfit is 1(i.e exact copy of one we already have, only have a small chance to pick it(this is due to
+        //in some cases when most of the population is the same, we migth have no other candidates.(should instead
+        //be replaced by a blank page when voting?
+        //if(maxfit==1) r=-1; <-- something like this maybe? but need to do more as this value is directly used
+        //as index below, maybe a getwebpage function that return an empty page if -1?
+        //2nd part will prefer individs that's similar to to the ones already selected, and the 3rd will prefer those not yet selected.
+
+
+        //This function did had a prefference of choosing more distant individuals.. BUT, what we really want is too choose between closely related that's not too close? rigth?
+        /*do{//while()
+            do{r = rand()%(int)igaObject->popSize();}while(nineList.contains(r)); //get unique r
+            maxfit=0;
+            for(int j=0;j<i;j++){
+                double fitness=population[r].distanceMulti[nineList[j]];
+                if(fitness>maxfit){
+                    maxfit=fitness;
+                }
+            }
+        }while(pRand(0.55+(maxfit/2)));*///if maxfit==1(same as the selected), dont choose same, if maxfit<0, always select
+        //formula used is 0.05+(maxfit/2)+0.5, 0.05 is if using small population, and the only available individuals is equal to one choosed, this would end in
+        //infinite loop. not the best solution as it may waste time if many similar, but good enough. "/2)+0.5" makes the lines less steep while still start at same point.
+            //if(nineFitness.contains(r) && pRand()) continue; //if done before, only 0.5 chance to keep
+
+        //double fitness=population[id].distanceMulti[i];
+
+        qDebug() << r << "selected";
         nineList.append(r);
     }
-    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+    qDebug() << "9 new selected!" << nineList;
+    /*QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
     Web9_1->setZoomFactor(1);
     Web9_2->setZoomFactor(1);
     Web9_3->setZoomFactor(1);
@@ -786,7 +858,7 @@ void Window::nineGenerateNew(){
     Web9_6->setZoomFactor(1);
     Web9_7->setZoomFactor(1);
     Web9_8->setZoomFactor(1);
-    Web9_9->setZoomFactor(1);
+    Web9_9->setZoomFactor(1);*/
     QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
     Web9_1->setPage(webPageVector[nineList[0]]);
     Web9_2->setPage(webPageVector[nineList[1]]);
@@ -797,7 +869,18 @@ void Window::nineGenerateNew(){
     Web9_7->setPage(webPageVector[nineList[6]]);
     Web9_8->setPage(webPageVector[nineList[7]]);
     Web9_9->setPage(webPageVector[nineList[8]]);
+    /*QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+    Web9_1->setZoomFactor(1);
+    Web9_2->setZoomFactor(1);
+    Web9_3->setZoomFactor(1);
+    Web9_4->setZoomFactor(1);
+    Web9_5->setZoomFactor(1);
+    Web9_6->setZoomFactor(1);
+    Web9_7->setZoomFactor(1);
+    Web9_8->setZoomFactor(1);
+    Web9_9->setZoomFactor(1);
     QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+
     Web9_1->setZoomFactor(0.5);
     Web9_2->setZoomFactor(0.5);
     Web9_3->setZoomFactor(0.5);
@@ -806,8 +889,34 @@ void Window::nineGenerateNew(){
     Web9_6->setZoomFactor(0.5);
     Web9_7->setZoomFactor(0.5);
     Web9_8->setZoomFactor(0.5);
-    Web9_9->setZoomFactor(0.5);
+    Web9_9->setZoomFactor(0.5);*/
     QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+    QString path1=QDir::currentPath() + "/img" + dateTime + "/" + igaObject->getCurrIName(nineList[0]) + ".png";
+    QString path2=QDir::currentPath() + "/img" + dateTime + "/" + igaObject->getCurrIName(nineList[1]) + ".png";
+    QString path3=QDir::currentPath() + "/img" + dateTime + "/" + igaObject->getCurrIName(nineList[2]) + ".png";
+    QString path4=QDir::currentPath() + "/img" + dateTime + "/" + igaObject->getCurrIName(nineList[3]) + ".png";
+    QString path5=QDir::currentPath() + "/img" + dateTime + "/" + igaObject->getCurrIName(nineList[4]) + ".png";
+    QString path6=QDir::currentPath() + "/img" + dateTime + "/" + igaObject->getCurrIName(nineList[5]) + ".png";
+    QString path7=QDir::currentPath() + "/img" + dateTime + "/" + igaObject->getCurrIName(nineList[6]) + ".png";
+    QString path8=QDir::currentPath() + "/img" + dateTime + "/" + igaObject->getCurrIName(nineList[7]) + ".png";
+    QString path9=QDir::currentPath() + "/img" + dateTime + "/" + igaObject->getCurrIName(nineList[8]) + ".png";
+
+    /*QPixmap imgtmp1 = QPixmap::grabWindow(Web9_1->winId()).scaledToWidth(200);
+    QPixmap imgtmp2 = QPixmap::grabWindow(Web9_2->winId()).scaledToWidth(200);
+    QPixmap imgtmp3 = QPixmap::grabWindow(Web9_3->winId()).scaledToWidth(200);
+    QPixmap imgtmp4 = QPixmap::grabWindow(Web9_4->winId()).scaledToWidth(200);
+    QPixmap imgtmp5 = QPixmap::grabWindow(Web9_5->winId()).scaledToWidth(200);
+    QPixmap imgtmp6 = QPixmap::grabWindow(Web9_6->winId()).scaledToWidth(200);
+    QPixmap imgtmp7 = QPixmap::grabWindow(Web9_7->winId()).scaledToWidth(200);
+    QPixmap imgtmp8 = QPixmap::grabWindow(Web9_8->winId()).scaledToWidth(200);
+    QPixmap imgtmp9 = QPixmap::grabWindow(Web9_9->winId()).scaledToWidth(200);
+
+    if(!imgtmp1.save(path1) || !imgtmp2.save(path2) || !imgtmp3.save(path3) || !imgtmp4.save(path4)){
+        qDebug() << "could not save files1";
+    }
+    if(!imgtmp5.save(path5) || !imgtmp6.save(path6) || !imgtmp7.save(path7) || !imgtmp8.save(path8) || !imgtmp9.save(path9) ){
+        qDebug() << "could not save files2";
+    }*/
 }
 void Window::init(){
     fitnessSlider->installEventFilter(this);
@@ -929,6 +1038,61 @@ void Window::closeEvent(QCloseEvent *event){
         event->ignore();
     }
 }
+void Window::initHtmlDistance(){
+    QString header = "<!doctype html>\n<html lang=\"en\">"
+             "<head>\n<meta charset=\"utf-8\">\n<title>The HTML5 Herald</title>\n"
+             "<meta name=\"description\" content=\"The HTML5 Herald\">\n"
+             "<meta name=\"author\" content=\"SitePoint\">\n"
+             "</head>\n<body>\n</body>\n</html>";
+    htmlDistance.mainFrame()->setHtml(header);
+    QFile file(QDir::currentPath() + "/img" + dateTime + "/distance.html");
+    if (file.open(QIODevice::ReadWrite)) {
+        QTextStream stream(&file);
+        stream.flush();
+        stream << htmlDistance.mainFrame()->toHtml() << endl;
+    }
+    file.close();
+}
+void Window::addToHtmlDistance(){
+    int imgWidth = 2000/igaObject->popSize();
+    int barHigth = imgWidth>50?imgWidth:50;
+    QString barHigthstr = QString::number(barHigth);
+
+    QString newhtml="<div id=\"wrapper\">";
+    for(int i=0;i<igaObject->popSize();i++){
+        newhtml+="<div id=\"wrapper\">";
+        newhtml+="<img src=\"" + igaObject->getCurrIName(i) + ".png\" style=\"width:"+QString::number(imgWidth)+"px;\"> : ";
+        QList<QPair<double,int> > dList;
+        for(int j=0;j<igaObject->popSize();j++){
+            if(j==i) continue;
+            double dist=population[i].distance[j];
+            if(dist>0){
+                dList.append(qMakePair(dist,j));
+            }
+        }
+        qSort(dList.begin(), dList.end(), QPairFirstComparer());
+        for(int id=dList.size()-1;id>=0;id--){
+
+            QString cname="myCanvas"+ QString::number(igaObject->getCurrGen()) + "a" +QString::number(id)+"a" +QString::number(i);
+            double fitn=dList[id].first;
+            newhtml += "<img src=\"" + igaObject->getCurrIName(dList[id].second) + ".png\" style=\"width:"+QString::number(imgWidth-9)+"px;\">"
+                       "<canvas id=\""+ cname +"\" width=\"5\" height=\""+barHigthstr+"\"></canvas><script>var ca = document.getElementById('"+ cname +"');"
+                       "var ct = ca.getContext('2d');ct.beginPath();ct.rect(0, "+barHigthstr+",5, " + QString::number(-fitn*barHigth)+ ")"
+                       ";ct.fillStyle = 'red';ct.fill();ct.stroke();</script>\n";
+        }
+         newhtml+= "</div><br />";
+    }
+    newhtml+= "</div><br />---------------<br />";
+
+    htmlDistance.mainFrame()->documentElement().lastChild().appendInside(newhtml);
+    QFile file(QDir::currentPath() + "/img" + dateTime + "/distance.html");
+    if (file.open(QIODevice::ReadWrite)) {
+        QTextStream stream(&file);
+        stream.flush();
+        stream << htmlDistance.mainFrame()->toHtml() << endl;
+    }
+    file.close();
+}
 
 void Window::initAncestryTree(){
     QString header = "<!doctype html>\n<html lang=\"en\">"
@@ -946,22 +1110,31 @@ void Window::initAncestryTree(){
         stream.flush();
         stream << AncetryTree.mainFrame()->toHtml() << endl;
     }
-
+    file.close();
 }
 
-void Window::addToAncestryTree(){
+void Window::addToAncestryTree(double f){
 
     int imgWidth = 1000/igaObject->popSize();
     int barHigth = imgWidth>50?imgWidth:50;
+
     QString barHigthstr = QString::number(barHigth);
 
     QString newhtml="<div id=\"wrapper\">";
     //" + QString::number(igaObject->getFitness(i))+ "
     for(int i=0;i<igaObject->popSize();i++){
+        double fitn;
+        if(!nineFitness.isEmpty()){
+            fitn=nineFitness[i];
+            //qDebug() << "fitn " << fitn;
+        }else{
+            fitn=(i==igaObject->popSize()-1) ? f :igaObject->getFitness(i);
+            //qDebug() << "boo " << fitn;
+        }
         QString cname="myCanvas"+ QString::number(igaObject->getCurrGen()) + "a" +QString::number(i);
         newhtml += "<div style=\"float:left;border:2px solid black\"><img src=\"" + igaObject->getCurrIName(i) + ".png\" style=\"width:"+QString::number(imgWidth-9)+"px;\">"
                    "<canvas id=\""+ cname +"\" width=\"5\" height=\""+barHigthstr+"\"></canvas><script>var ca = document.getElementById('"+ cname +"');"
-                   "var ct = ca.getContext('2d');ct.beginPath();ct.rect(0, "+barHigthstr+",5, " + QString::number(-igaObject->getFitness(i)*barHigth)+ ")"
+                   "var ct = ca.getContext('2d');ct.beginPath();ct.rect(0, "+barHigthstr+",5, " + QString::number(-fitn*barHigth)+ ")"
                    ";ct.fillStyle = 'red';ct.fill();ct.stroke();</script></div>\n";
     }
     newhtml+= "</div>";

@@ -36,7 +36,7 @@ void Bento::computeBentoTree(BentoTree& bentoTree)
 	QWebElement body = mBrowserDocument.findFirst("body");
 	BentoBlock* rootBlock = new BentoBlock(body);
 
-	blockExtractionPass(rootBlock);
+    blockExtractionPass(rootBlock);
 	bentoTree.init(rootBlock);
 
 //    for (int i=0; i<bentoTree.mPostOrderList.size(); i++)
@@ -174,7 +174,7 @@ void Bento::atLeastTwoChildren(BentoBlock* bentoBlock) const
 		BentoBlock* temp = NULL;
 		if(bentoBlock->mChildren.size() != 1) break;
 
-		if(bentoBlock->mSameSizeContent || (!bentoBlock->mDOMNode.isNull() && (bentoBlock->mDOMNode.styleProperty("background-image", QWebElement::ComputedStyle)!="none" || DOMUtils::numTextChildren(bentoBlock->mDOMNode)>0)) || !bentoBlock->mParent) {
+        if(bentoBlock->mSameSizeContent || (!bentoBlock->mDOMNode.isNull() && (bentoBlock->mDOMNode.styleProperty("background-image", QWebElement::ComputedStyle)!="none" || DOMUtils::numTextChildren(bentoBlock->mDOMNode)>0)) || !bentoBlock->mParent) {
             temp = bentoBlock->mChildren[0];
 			bentoBlock->mChildren.clear();
 			for(int i=0; i<temp->mChildren.size(); i++) { temp->mChildren[i]->mParent = bentoBlock; bentoBlock->mChildren.append(temp->mChildren[i]);}
@@ -205,10 +205,10 @@ void Bento::removeSameSizeChild(BentoBlock* bentoBlock) const
 		QRect intersectBBox = bBox.intersect(childBBox);
 		float percentAreaIntersect = (intersectBBox.width()*intersectBBox.height())/(1.0*childArea);
 		float relativeArea = childArea/area;
-		if (percentAreaIntersect>=0.98 && relativeArea>=0.98) {
+        if (percentAreaIntersect>=0.98 && relativeArea>=0.98) {
 			temp = bentoBlock->mChildren[i];
-            if(!temp->mDOMNode.isNull() && (DOMUtils::numTextChildren(temp->mDOMNode) /*|| temp->mDOMNode.tagName()=="IMG"*/ || temp->mDOMNode.styleProperty("background-image", QWebElement::ComputedStyle)!="none"))
-				bentoBlock->mSameSizeContent = true;
+            if(!temp->mDOMNode.isNull() && (DOMUtils::numTextChildren(temp->mDOMNode) || temp->mDOMNode.tagName()=="IMG" || temp->mDOMNode.styleProperty("background-image", QWebElement::ComputedStyle)!="none"))
+                bentoBlock->mSameSizeContent = true;
 			
 			bentoBlock->mChildren.remove(i);
 			

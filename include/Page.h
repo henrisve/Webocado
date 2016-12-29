@@ -30,6 +30,9 @@ public:
     QVector<QColor> mColor;
     QHash<QString, QVector<QString> > ComputedStyleList;
     QString pID; //uniqe id for each page, so we can track the pages.
+    QVector<QVector<QVector<QVector<int> > > > histogram; //X,Y,rgb,bin
+    QList<double> distance;
+    QList<double> distanceMulti;
 	
 public:
     inline bool pRand(double probability=0.5){ return (double)rand()/RAND_MAX < probability;}//Move to a common function file?
@@ -56,7 +59,6 @@ public:
         if(pRand()){ //Todo: add parameter for this
             ComputedStyleList.clear();
         }
-
         //need to be called twice due to things change
         //during the first call.. Can probably be done in a nicer way.
         updateStyleList(mBentoTree->mRootBlock);
@@ -66,15 +68,19 @@ public:
     inline void updateStyles(){updateStyles(mBentoTree->mRootBlock);}
     void updateStyleList(BentoBlock* bentoBlock);
     void updateStyles(BentoBlock* bentoBlock);
-
     void updatePage(Page &newPage);
     void updatePage(Page &newPage, QWebElement newpart, int location);//for the copy of pages!
     QString getHtml(){return webpageP->mainFrame()->toHtml();}
     int addStyles(QString styleValue, QString key);
+    void buildColorList();
+    void updateColor();
 
-    Page(QWebPage& webPage=*new QWebPage, int pageID=0, QString url="", int ind=-1);
+    Page(QWebPage& webPage=*new QWebPage, int pageID=0, QString url="", int ind=-1, QString dateT="nope");
     ~Page() { delete mBentoTree; }
     QWebPage* webpageP;
+
+    bool saveImage();
+    void createHistogram();
 
 
 
@@ -82,7 +88,13 @@ public:
 
 private:
     double fitness;
-    double diffFitness;  //Not used yet, bet should be better that way
+    double diffFitness;  /*Not used yet, but the idea is to also use
+                           the diff on how the fitness changes for each page*/
+    QImage image; //screenshot of the page
+    QString dateTime;
+
+
+
 
     //for the copy of pages!
     void copyPage(BentoBlock* copyBlock,BentoBlock* orgBlock);

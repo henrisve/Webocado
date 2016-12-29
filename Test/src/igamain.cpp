@@ -8,7 +8,8 @@
 #include <QDoubleSpinBox>
 #include  <random>
 #include <QColor>
-
+#include "Page.h"
+#include <unordered_set>
 
 
 //For test?
@@ -87,22 +88,47 @@ void igacado::initIgacado(QHash<QString,QDoubleSpinBox*> *set,QHash<QString,QLis
     evolveType.append(qMakePair(settings->value("S_Selective_Mut_Text")->value(),textKeyList));
     evolveType.append(qMakePair(settings->value("S_Selective_Mut_Border")->value(),borderKeyList));
     evolveType.append(qMakePair(settings->value("S_Selective_Mut_Other")->value(),otherKeyList));
-
+    updateSettings();
 
     numLim=numericLimits;
     populationSize=popSize;
 
-    for(int i=0;i<popSize;i++){
-        fitnessList.append(0);//init the list of fitness to all 0
-        parents.append(qMakePair(0,0));
-    }
     //to make this  correct, use &pop above instead of *pop(and change [0][i] everywhere...)
     population=pop; //turn This into an 2-dimensional??
+    qDebug()<< "prepare lists etc, these are done";
+    for(int i=0;i<populationSize;i++){
+
+        fitnessList.append(0);//init the list of fitness to all 0
+        parents.append(qMakePair(0,0));
+        for(int j=0;j<popSize;j++){
+            population[0][i].distance.append(1);
+            population[0][i].distanceMulti.append(1);
+        }
+        population[0][i].updateStyleList();
+        population[0][i].buildColorList();
+        population[0][i].updateColor();
+        population[0][i].updateStyles();
+        qDebug()<<i;
+    }
     currGeneration=0;
     currIndividial=0;
-    //mutateColor();
-    updateSettings();
+    qDebug()<<"done!" << endl << "mutate";
+    mutate();
 
+    for(int i=0;i<populationSize;i++){
+        population[0][i].updateColor();
+        population[0][i].updateStyles();
+        population[0][i].updateStyleList();
+        population[0][i].buildColorList();
+        population[0][i].updateColor();
+        population[0][i].updateStyles();
+        population[0][i].saveImage();
+        population[0][i].createHistogram();
+
+    }
+    qDebug()<<"done!" << endl << "calc distances";
+    calcHistDist();
+    qDebug()<<"done!" << endl;
 }
 void igacado::updateSettings(){
     evolveType[0].first=settings->value("S_Selective_Mut_Color")->value(); //bah, maybe should have used hash...
@@ -181,6 +207,9 @@ void igacado::nextIndividual(double fitness){//bool like,int time){
         currGeneration++; //for now we wont stop when we get to number of generation
         currIndividial=0;
         nextGeneration();
+        qDebug() << "calc Distance ";
+        calcHistDist();
+        qDebug() << "Done " << endl;
     }
     updateSettingWidgets();
 
@@ -216,8 +245,9 @@ void igacado::nextGeneration(){
     //qDebug() << "ge3" << population[0][1].mBentoTree->mRootBlock->mChildren.size()<< " : " <<population[0][1].mBentoTree->mRootBlock->mChildren.size() << endl;
 
     qDebug() << "Done, create new population, the following is done:" << endl;
-    QVector<int> newindsort;
-    QVector<int> indexsort;
+    //QVector<int> newindList;
+    //QVector<int> indexsort;
+    QList<QPair<int,int> > parentList;
     QVector<int> islandPop;
     QVector<int> islandPopSize;
     QVector<double> islandFitness;
@@ -249,7 +279,7 @@ void igacado::nextGeneration(){
 
     int previousIsland;
     int prevIndivid=-1;
-    double crossIslandProb=0; ///////////////////////////  MOVE THIS OUTSIDE!!
+    double crossIslandProb=0.2; ///////////////////////////  MOVE THIS OUTSIDE!!
     //for(int i=0;i<populationSize-islandFitness.size()+1;i++){
     for(int i=0;i<floor(populationSize/2)*2;i++){
     // for(int i=0;i<populationSize;i++){
@@ -267,8 +297,8 @@ void igacado::nextGeneration(){
             if(isEven(i) || pRand(crossIslandProb)){
 
                 std::vector<int> weights;
-                for(int i=0; i<islandFitness.size(); i++) {
-                    weights.push_back(20+islandFitness[i]*10); //100+ makes the weigt "more equal"
+                for(int k=0; k<islandFitness.size(); k++) { //This is not needed to be done every time?? move out!
+                    weights.push_back(20+islandFitness[k]*10); //100+ makes the weigt "more equal"
                     //qDebug() << weights.back() << " ; ";
                 }
                 //qDebug() << "woooooend " << endl;
@@ -289,7 +319,7 @@ void igacado::nextGeneration(){
             }
             //Now we have selected the island we want,
         }
-        qDebug() << "island " << randIsland;
+        //qDebug() << "island " << randIsland;
         //This part prepare the list for tournament
         QList<QPair<double,int> > tslist;
         for(int j=0;j<tournamentSize;j++){
@@ -310,33 +340,38 @@ void igacado::nextGeneration(){
         int newind=tournamentSelection(tslist, tournamentSelectionParameter);
         qDebug() << "newind " << newind << endl;
         prevIndivid=newind;
+        if(isEven(i)){
+            parentList.append(qMakePair(newind,99));
+            parentList.append(qMakePair(99,newind));
+        }else{
+            int s=parentList.size();
+            parentList[s-2].second=newind;
+            parentList[s-1].first=newind;
+        }
 
+
+        //
+        /*
 
         //same but sort
         int ji=0;
         for(int j=0;j<newindsort.size();j++){
             if(newind<=newindsort[j]){
                 //newindsort.insert(j,newind);
-                //indexsort.insert(j,i); //why do we even need to know this?
+                //indexsort.insert(j,i);
                 break;
             }
             ji++;
         }
         newindsort.insert(ji,newind);
         indexsort.insert(ji,i);
+        */
 
     }
-    //qDebug() << "ge5" << population[0][1].mBentoTree->mRootBlock->mChildren.size()<< " : " <<population[0][1].mBentoTree->mRootBlock->mChildren.size() << endl;
+    //qDebug() << endl << parentList;
+    QList<int> sortList = sortedIndex(parentList);
+    //qDebug() << endl << sortList << endl;
 
-
-//    foreach (int ao, newindsort) {
-//        qDebug() << ao << population[0][ao+populationSize].mPageID << endl;
-//    }
-
-    //        for(int i=0;i<populationSize;i++){
-    //            population[0][i].updatePage(population[0][newindsort[i]+populationSize]);
-    //            fitnessList[i]=fitnessCopy[newindsort[i]]; //the fitness variable should have been in each page object...
-    //        }
 
     for(int i=0;i<floor(populationSize/2)*2;i+=2){ //rounds down to even number
     //for(int i=0;i<populationSize-islandFitness.size();i+=2){ //for readability, should be other than islandfitness, is just the number of islands
@@ -345,20 +380,23 @@ void igacado::nextGeneration(){
             //population[0][i+1].updatePage(population[0][newindsort[i+1]+populationSize]);
             //fitnessList[i]=fitnessCopy[newindsort[i]]; //the fitness variable should have been in each page object...
 
-            int i1 = indexsort[i];
-            int i2 = indexsort[i+1];
-            int is1= newindsort[i];
-            int is2= newindsort[i+1];
-            population[0][i1].updatePage(population[0][is1+populationSize]);
-            population[0][i2].updatePage(population[0][is2+populationSize]);
-            qDebug() << "new individs" << i1 <<" and " <<i2 << " from " <<is1<< " and " << is2 << endl;
-            fitnessList[i1]=fitnessCopy[newindsort[i1]]; //the fitness variable should have been in each page object...
-            fitnessList[i2]=fitnessCopy[newindsort[i2]];
+            int i1 = sortList[i];//indexsort[i];
+            int i2 = sortList[i+1];//indexsort[i+1];
+            //int is1= newindsort[i];
+            //int is2= newindsort[i+1];
+            int p1=parentList[i].first;
+            int p2=parentList[i].second;
+
+            population[0][i1].updatePage(population[0][p1+populationSize]);
+            population[0][i2].updatePage(population[0][p2+populationSize]);
+            qDebug() << "new individs" << i1 <<" and " <<i2 << " from " <<p1<< " and " << p2 << endl;
+            fitnessList[i1]=fitnessCopy[p1]; //the fitness variable should have been in each page object...
+            fitnessList[i2]=fitnessCopy[p2];
 
             int s1 = population[0][i1].mColor.size();
             int s2 = population[0][i2].mColor.size();
-            int p1start = s1>1 ? (qrand()%(s1-2))+1 : 0;
-            int p2start = s2>1 ? (qrand()%(s2-2))+1 : 0;
+            int p1start = s1>2 ? (qrand()%(s1-2))+1 : 0;
+            int p2start = s2>2 ? (qrand()%(s2-2))+1 : 0;
             int maxlen = s1-p1start < s2-p2start ? s1-p1start : s2-p2start;
             int len = qrand()%maxlen;
 
@@ -381,18 +419,18 @@ void igacado::nextGeneration(){
 
            // qDebug() << endl << "pop " << i << " is now " << newindsort[i] << ". we update " << i1 << endl;
             //() << endl << "pop " << i+1 << " is now " << newindsort[i+1] << ". we update " << i2 << endl;
-            int parent1=newindsort[i1];
-            int parent2=newindsort[i2];
-            if(parent2<parent1){
+            int parent1=p1;
+            int parent2=p2;
+            if(parent2>parent1){ //just to make the graph look nicer without crossings
                 int tmp=parent2;
                 parent2=parent1;
                 parent1=tmp;
             }
 
 
-            qDebug() << "new individs" << i1 <<" and " <<i2 << " from " <<newindsort[i1]<< " and " << newindsort[i2] << endl;
-            population[0][i1].pID=(QString::number(currGeneration) + "_" + QString::number(i1) + "_" + QString::number(newindsort[i1]) + "+" + QString::number(newindsort[i2]));
-            population[0][i2].pID=(QString::number(currGeneration) + "_" + QString::number(i2) + "_" + QString::number(newindsort[i1]) + "+" + QString::number(newindsort[i2]));
+            //qDebug() << "new individs" << i1 <<" and " <<i2 << " from " <<newindsort[i1]<< " and " << newindsort[i2] << endl;
+            population[0][i1].pID=(QString::number(currGeneration) + "_" + QString::number(i1) + "_" + QString::number(p1) + "+" + QString::number(p2));
+            population[0][i2].pID=(QString::number(currGeneration) + "_" + QString::number(i2) + "_" + QString::number(p2) + "+" + QString::number(p1));
             parents[i1].first=parent1;
             parents[i1].second=parent2;
             parents[i2].first=parent1;
@@ -413,7 +451,7 @@ void igacado::nextGeneration(){
      */
     QList<double> elites;
     QList<int> elitesindex;
-    for(int i=0;i<islandFitness.size();i++){
+    for(int i=0;i<islandFitness.size();i++){ //I should have used some variable for number of islands....
         elites.append(0);
         elitesindex.append(0); //is there a better way to fill??
     }
@@ -429,33 +467,53 @@ void igacado::nextGeneration(){
    if(islandMode){
        islandPop.clear();
        islandPopSize.clear();
-       islandFitness.clear();
        //QVector<int> populationIsland;
        //calc island pop//calc island fitness
+       //test a better way
        for(int i=0;i<populationSize;i++){
            int island=population[0][i].mPageID;
            if(island>=islandPop.size()){
                islandPop.append(i);
                islandPopSize.append(1);
-               islandFitness.append(fitnessCopy[i]);
-               if(island>0){
-                   islandFitness[island-1]/=(int)islandPopSize[island-1];//islandPop[island]-islandPop[island-1];
-               }
            }else{
                islandPopSize[island]++;
-               islandFitness[island]+=fitnessCopy[i];
            }
        }
+       if(islandPop.size()<elitesindex.size()){
+           islandPop.append(populationSize-1);
+           islandPopSize.append(0);
+       }
+ //      int tmpi=0;
+ //      for(int i=0;i<populationSize;i++){
+ //          int island=population[0][i].mPageID;
+ //         if(tmpi<island){ //new island found!
+ //
+ //          }
+ //      }
    }
     for(int i=0;i<elitesindex.size();i++){
         int index=islandPop[i]+islandPopSize[i]-1;
         //qDebug() << "pop" << islandPop[i] << "+" << islandPopSize[i]<< "=" << index << endl;
         //population[0][elitesindex[0]+popSize()].mColor[1].setRgb(255,0,255,200);
         population[0][index].updatePage(population[0][elitesindex[i]+popSize()]);
-        population[0][index].pID = QString::number(currGeneration) + "_E" + QString::number(i) + "_" + QString::number(elitesindex[i]);
+        population[0][index].pID = QString::number(currGeneration) + "_" + QString::number(index) + "_E" + QString::number(i) + "_" + QString::number(elitesindex[i]);
         parents[index].first=elitesindex[i];
         parents[index].second=-1;
 
+    }
+    qDebug() << "Done " << endl;
+    qDebug()<<"update styles,save image and create histogram,";
+    for(int i=0;i<populationSize;i++){
+
+        population[0][i].updateColor();
+        population[0][i].updateStyles();
+        population[0][i].updateStyleList();
+        population[0][i].buildColorList();
+        population[0][i].updateColor();
+        population[0][i].updateStyles();
+
+        population[0][i].saveImage();
+        population[0][i].createHistogram();
     }
 //    int i=1;
 //        int index=popSize()-elitesindex.size()+i;
@@ -523,12 +581,12 @@ void igacado::crossOverBasic(bricolage::Page* mPage1,bricolage::Page* mPage2/*,b
 
 
  //   foreach(QString key,keys){
-    qDebug() << endl << currGeneration << endl;
+    //qDebug() << endl << currGeneration << endl;
     foreach(QString key, keysEvol){
 
 
         if(pRand(BasicCrossProbaKey) && (keysPage1.contains(key) || keysPage2.contains(key))){
-            qDebug() << key << " - basic cross thing" ;
+            //qDebug() << key << " - basic cross thing" ;
             if (keysPage1.contains(key) && !keysPage2.contains(key)){ //If key only exist in one, copy to the other.
                  mPage2->ComputedStyleList[key]=mPage1->ComputedStyleList[key];
             }else if(!keysPage1.contains(key) && keysPage2.contains(key)){
@@ -539,9 +597,9 @@ void igacado::crossOverBasic(bricolage::Page* mPage1,bricolage::Page* mPage2/*,b
                 int s1 = list1.size();
                 int s2 = list2.size();
                 if((s1<2 && s2<2) || pRand(0.5)){ //if short, just swap whole list. "==1"  //Todo: Add parameter for keylevelCrossover
-                    qDebug() << "- swap whole:" << s1 << "-" << s2 << "-";
+                   // qDebug() << "- swap whole:" << s1 << "-" << s2 << "-";
                     if(!pRand(BasicCrossKeepLengthProb) || s1==s2){
-                        qDebug() << "yes" << endl;
+                        //qDebug() << "yes" << endl;
                         mPage1->ComputedStyleList[key]=list2;
                         mPage2->ComputedStyleList[key]=list1;
                     }
@@ -852,6 +910,164 @@ double igacado::limMinMax(double value,QString key){
         return limMinMax(value,numLim->value(key)[0],numLim->value(key)[1]);
     }
     return value;
+}
+QList<int> igacado::sortedIndex(QList<QPair<int,int> > parentList){
+    QList<int> listout;
+    int len=parentList.size();
+    for(int i=0;i<len;i++){
+        listout.append(0);
+    }
+
+
+    for(int i=0;i<len-1;i++){
+        for(int j=i+1;j<len;j++){
+            if(parentList[i].first > parentList[j].first){
+                listout[i]++;
+            }else if(parentList[i].first < parentList[j].first){
+                listout[j]++;
+            }else{
+                if(parentList[i].second > parentList[j].second){
+                    listout[i]++;
+                }else{
+                    listout[j]++;
+                }
+            }
+        }
+    }
+    return listout;
+}
+
+void igacado::calcHistDist(){
+    QVector<QVector<QVector<QVector<int> > > > h1;
+    QVector<QVector<QVector<QVector<int> > > > h2;
+    int windows = population[0][0].histogram.size();
+    int bins = population[0][0].histogram[0][0][0].size();
+    int binPenalty=5;
+
+    for(int i=0;i<popSize()-1;i++){
+        bricolage::Page* p1 = &population[0][i];
+        //qDebug() << i ;
+        h1=population[0][i].histogram;
+        for(int j=i+1;j<popSize();j++){
+            bricolage::Page* p2 = &population[0][j];
+            //for each populaion with eachother, remember dij=dji
+            h2=population[0][j].histogram;
+            double dist=0;
+            for(int wx=0;wx<windows;wx++){
+                for(int wy=0;wy<windows;wy++){
+                    double sumdist=0;
+                    for(int irgb=0;irgb<3;irgb++){
+                        //uint maxdist=0;
+                        //uint d=1;
+                        double distarea=0;
+                        for(int bin=0;bin<bins;bin++){
+                            int d=1;
+                            int d1=0;
+                            int d1min=10000;
+                            int d2=0;
+                            int d2min=10000;
+                            int ic=0;
+
+                            for(int ic=0;ic<d;(ic>0?ic=-ic:ic=-ic+1)){
+                                if(bin+ic<bins && bin+ic >=0){
+                                    d1=abs(h1[wx][wy][irgb][bin]-h2[wx][wy][irgb][bin+ic])+(abs(ic)*binPenalty);
+                                    d2=abs(h1[wx][wy][irgb][bin+ic]-h2[wx][wy][irgb][bin])+(abs(ic)*binPenalty);
+                                    if(d1<d1min) d1min=d1;
+                                    if(d2<d2min) d2min=d2;
+                                    if(d1min<d2min){
+                                        d=d2min;
+                                    }else if(d1min>=d2min){
+                                        d=d1min;
+                                    }
+                                }
+                            }
+                            /*d=abs(h1[wx][wy][irgb][bin]-h2[wx][wy][irgb][bin]);
+                            if(d>0){
+
+                            }
+                            distarea+=d;
+                            if(d>maxdist){
+                                maxdist=d;
+                            }*/
+                            distarea+=d;
+                        }
+                        sumdist+=(distarea/2500)*(distarea/2500);//maxdist;
+                    }
+                    dist+=sqrt(sumdist);
+                }
+
+            }
+
+            dist=1-((dist*2)/(windows*windows)); //1=same, < 0 too far away
+            double styleDist=0;
+            double styleDist2=0;
+            int elementProduct=20;
+            //dist now include the histogram distance, now try the other features
+            QStringList keys1=p1->ComputedStyleList.keys();
+            QStringList keys2=p2->ComputedStyleList.keys();
+            QStringList keys=keys1;
+            foreach(QString key,keys2){
+                if(!keys.contains(key)) keys.append(key);
+            }
+            foreach(QString key,keys){
+                if(!keys1.contains(key)) //ie, only in keys2
+                    styleDist += population[0][j].ComputedStyleList[key].size()*elementProduct;
+                else if(!keys2.contains(key)) //ie, only in keys2
+                    styleDist += population[0][i].ComputedStyleList[key].size()*elementProduct;
+                else{//both have the key
+                    QSet<QString> textInKeyp1;
+                    QList<double> numInKeyp1;
+                    QSet<QString> textInKeyp2;
+                    QList<double> numInKeyp2;
+                    for(int iStyle=0;iStyle<p1->ComputedStyleList[key].size();iStyle++){
+                        QList<double> newintlist1= getNumberFromQString2(p1->ComputedStyleList[key][iStyle]);//add to string...
+                        if(newintlist1.empty()){
+                            textInKeyp1.insert(p1->ComputedStyleList[key][iStyle]);
+                        }else{
+                            numInKeyp1.append(newintlist1[0]); //not common with many, ignore for now
+                        }
+                    }
+                    for(int iStyle=0;iStyle<p2->ComputedStyleList[key].size();iStyle++){
+                        QList<double> newintlist2= getNumberFromQString2(p2->ComputedStyleList[key][iStyle]);
+                        if(newintlist2.empty()){
+                            textInKeyp2.insert(p2->ComputedStyleList[key][iStyle]);
+                        }else{
+                            numInKeyp2.append(newintlist2[0]);
+                        }
+
+                    }
+                    styleDist+=(textInKeyp1.size()+textInKeyp2.size()-2*textInKeyp1.intersect(textInKeyp2).size())*elementProduct;//probably worst way,
+
+                    int s1=numInKeyp1.size();
+                    int s2=numInKeyp2.size();
+                    double s=s1<s2?s1:s2;
+                    double sm=s1>s2?s1:s2;
+                    double sum=0;
+                    for(int il=0;il<s;il++){
+
+                        if(s1<s2)
+                            sum+=abs(numInKeyp1[il]-numInKeyp2[int(il*(sm/s)+(sm)/(2*s))]);
+                        else
+                            sum+=abs(numInKeyp2[il]-numInKeyp1[int(il*(sm/s)+(sm)/(2*s))]);
+                    }
+
+                    if(s>0){
+                        styleDist2+=sum/s;
+                    }
+
+
+                }
+            }
+
+            population[0][i].distance[j]=dist;
+            population[0][j].distance[i]=dist;
+            double tmpSD1=1-(styleDist/20);
+            double tmpSD2=1-(styleDist2/500);
+            population[0][i].distanceMulti[j]=(dist+dist+tmpSD1+tmpSD2)/4; //Check what solution is the best
+            population[0][j].distanceMulti[i]=(dist+dist+tmpSD1+tmpSD2)/4;
+            qDebug() << endl << i << " to " << j << " has a distance of (only img)" << dist << " (all): " << (dist+dist+tmpSD1+tmpSD2)/4 << " sd1:"<< tmpSD1 << " sd2:" <<tmpSD2 ;
+        }
+    }
 }
 
 //#####################################################################

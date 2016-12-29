@@ -7,6 +7,7 @@
 #include "BlockExtractor.h"
 #include "BentoBlock.h"
 using namespace bricolage;
+bool debugThis=false;
 //#####################################################################
 // BlockExtractor
 //#####################################################################
@@ -18,27 +19,26 @@ BlockExtractor::BlockExtractor(BentoBlock* rootBlock)
 //#####################################################################
 // Function divideDOMTree
 //#####################################################################
-void BlockExtractor::divideDOMTree(QWebElement& domNode)
-{
-    //qDebug() << domNode.tagName() << " " << domNode.attribute("id") << " " << domNode.attribute("class");
+void BlockExtractor::divideDOMTree(QWebElement& domNode){
+    if(debugThis) qDebug() << endl << "##" << domNode.tagName() << " " << domNode.attribute("id") << " " << domNode.attribute("class");
 	int result = isDividable(domNode);
 	if (result == DIVIDE) {
 		QWebElement child = domNode.firstChild();
 		while(!child.isNull()) { divideDOMTree(child); child = child.nextSibling(); }
-	}
-	else if (result == NOT_DIVIDE)
+    }else if (result == NOT_DIVIDE)
 		mBlockPool.insert(new BentoBlock(domNode)); 
 }
 //#####################################################################
 // Function isDividable
 //#####################################################################
+//This function could definetly improve...
 int BlockExtractor::isDividable(QWebElement& domNode)
 {	
 	if (!DOMUtils::isValidNode(domNode)) return DONE;
 	
 	int result; QString tag = domNode.tagName();
 
-	
+
     //if(tag=="IMG") return DIVIDE;  //TODO, did I do this??
 
 	result=ruleIsRootBlock(domNode); if (result!=MOVE_ON) return result;
@@ -80,8 +80,8 @@ int BlockExtractor::isDividable(QWebElement& domNode)
 int BlockExtractor::ruleIsRootBlock(const QWebElement& domNode) const
 {
 	if(domNode == mRootBlock->mDOMNode) { 
-        //qDebug() << "DIVIDE (ruleIsRootBlock)";
-		return DIVIDE; 
+        if(debugThis) qDebug() << "DIVIDE (ruleIsRootBlock)";
+        return DIVIDE;
 	}
 	return MOVE_ON;
 }
@@ -91,7 +91,7 @@ int BlockExtractor::ruleIsRootBlock(const QWebElement& domNode) const
 int BlockExtractor::ruleIsHiddenOverflow(QWebElement& domNode) const
 {	
 	if(DOMUtils::isHiddenOverflow(domNode)) { 
-        //qDebug() << "DIVIDE (ruleIsHiddenOverflow)";
+        if(debugThis) qDebug() << "DIVIDE (ruleIsHiddenOverflow)";
 		return DIVIDE; 
 	}
 	return MOVE_ON;
@@ -101,11 +101,11 @@ int BlockExtractor::ruleIsHiddenOverflow(QWebElement& domNode) const
 //#####################################################################
 int BlockExtractor::ruleBackgroundImage(QWebElement& domNode) const
 {
-	if(domNode.styleProperty("background-image", QWebElement::ComputedStyle)!="none") {
+    if(domNode.styleProperty("background-image", QWebElement::ComputedStyle)!="none") {
 		QRect bBox = DOMUtils::getGeometry(domNode);
-        if (DOMUtils::hasValidDimensions(bBox)) { /*qDebug() << "NOT_DIVIDE (ruleBackgroundImage)";*/ return NOT_DIVIDE; }
-        else { /*qDebug() << "DIVIDE (ruleBackgroundImage)";*/ return DIVIDE; }
-	}
+        if (DOMUtils::hasValidDimensions(bBox)) { if(debugThis) qDebug() << "NOT_DIVIDE (ruleBackgroundImage)"; return NOT_DIVIDE; }
+        else { if(debugThis) qDebug() << "DIVIDE (ruleBackgroundImage)"; return DIVIDE; }
+    }
 	return MOVE_ON;
 }
 //#####################################################################
@@ -117,9 +117,9 @@ int BlockExtractor::ruleTextChildren(QWebElement& domNode) const
 		if (DOMUtils::hasOnlyTextChildren(domNode)) {
 			QRect bBox = DOMUtils::getGeometry(domNode);
 			int left = DOMUtils::parsePixelFeature(domNode.styleProperty("text-indent", QWebElement::ComputedStyle)) + bBox.left() + bBox.width();
-            if (left<0) { /*qDebug() << "DONE (ruleTextChildren)";*/ return DONE; }
+            if (left<0) { if(debugThis) qDebug() << "DONE (ruleTextChildren)"; return DONE; }
 		}
-        /*qDebug() << "NOT_DIVIDE (ruleTextChildren)";*/ return NOT_DIVIDE;
+        if(debugThis) qDebug() << "NOT_DIVIDE (ruleTextChildren)"; return NOT_DIVIDE;
 	}
  	return MOVE_ON;
 }
@@ -134,7 +134,7 @@ int BlockExtractor::ruleNoValidChildren(QWebElement& domNode) const
 		if(DOMUtils::isValidNode(child)) return MOVE_ON;
 		child = child.nextSibling(); 
 	}
-    //qDebug() << "DONE (ruleNoValidChildren)";
+    if(debugThis) qDebug() << "DONE (ruleNoValidChildren)";
 	return DONE;
 }
 //#####################################################################
@@ -150,7 +150,7 @@ int BlockExtractor::ruleOneValidChild(QWebElement& domNode) const
 		child = child.nextSibling(); 
 	}
 	if(validChildCount==1) { 
-        //qDebug() << "DIVIDE (ruleOneValidChild)";
+        if(debugThis) qDebug() << "DIVIDE (ruleOneValidChild)";
 		return DIVIDE; 
 	}
 	return MOVE_ON;
@@ -182,7 +182,7 @@ int BlockExtractor::ruleNoChildrenInBBox(QWebElement& domNode) const
 			else if(bBox.contains(childBBox)) return MOVE_ON;
 		}
 	}
-    //qDebug() << "DIVIDE (ruleNoChildrenInBBox)";
+    if(debugThis) qDebug() << "DIVIDE (ruleNoChildrenInBBox)";
 	return DIVIDE;
 }
 //#####################################################################
@@ -195,7 +195,7 @@ int BlockExtractor::ruleAllChildrenVTextNodes(QWebElement& domNode) const
 		if (!DOMUtils::isVirtualTextNode(child)) return MOVE_ON;
 		child = child.nextSibling();
 	}
-    //qDebug() << "NOT_DIVIDE (ruleAllChildrenVTextNodes)";
+    if(debugThis) qDebug() << "NOT_DIVIDE (ruleAllChildrenVTextNodes)";
 	return NOT_DIVIDE;
 }
 //#####################################################################
@@ -206,7 +206,7 @@ int BlockExtractor::ruleLineBreakChild(const QWebElement& domNode) const
 	QWebElement child = domNode.firstChild();
 	if (!child.isNull()) {
 		if (DOMUtils::isLineBreakNode(child)) { 
-            //qDebug() << "DIVIDE (ruleLineBreakChild)";
+            if(debugThis) qDebug() << "DIVIDE (ruleLineBreakChild)";
 			return DIVIDE; 
 		}
 		child = child.nextSibling();}
@@ -220,7 +220,7 @@ int BlockExtractor::ruleHRChild(const QWebElement& domNode) const
 	QWebElement child = domNode.firstChild();
 	if (!child.isNull()) {
 		if (child.tagName()=="HR") { 
-            //qDebug() << "DIVIDE (ruleHRChild)";
+            if(debugThis) qDebug() << "DIVIDE (ruleHRChild)";
 			return DIVIDE; 
 		}
 	child = child.nextSibling(); }
@@ -247,7 +247,7 @@ int BlockExtractor::ruleDiffBackgroundColorChild(const QWebElement& domNode)
 		else divideDOMTree(child);
 		child = child.nextSibling();
 	}
-    //qDebug() << "NOT_DIVIDED " << QString::number(differingChildren.size()) << " (ruleDiffBackgroundColorChild)";
+    if(debugThis) qDebug() << "NOT_DIVIDED " << QString::number(differingChildren.size()) << " (ruleDiffBackgroundColorChild)";
 	return DONE;
 }
 //#####################################################################
@@ -259,7 +259,7 @@ int BlockExtractor::ruleSameSizeAsRoot(QWebElement& domNode) const
 	float domArea = domRect.width()*domRect.height();
 	float rootArea = mRootBlock->mGeometry.width()*mRootBlock->mGeometry.height();
     if (domArea/(1.0*rootArea)>0.95/*0.85*/) {
-        //qDebug() << "DIVIDE (SameSizeAsRoot)";
+        if(debugThis) qDebug() << "DIVIDE (SameSizeAsRoot)";
 		return DIVIDE; 
 	}
 	return MOVE_ON;
@@ -271,8 +271,8 @@ int BlockExtractor::ruleSiblingNotDivided(const QWebElement& domNode) const
 { 
 	foreach (BentoBlock* bentoBlock, mBlockPool)
 		if(domNode.previousSibling()==bentoBlock->mDOMNode) { 
-            //qDebug() << "NOT_DIVIDE (ruleSiblingNotDivided)";
-			return NOT_DIVIDE; 
+            if(debugThis) qDebug() << "NOT_DIVIDE (ruleSiblingNotDivided)";
+            return NOT_DIVIDE;
 		}
 	return MOVE_ON;
 }
@@ -281,6 +281,6 @@ int BlockExtractor::ruleSiblingNotDivided(const QWebElement& domNode) const
 //#####################################################################
 int BlockExtractor::ruleNotDivide() const
 {
-    //qDebug() << "NOT_DIVIDE (ruleNotDivide)";
+    if(debugThis) qDebug() << "NOT_DIVIDE (ruleNotDivide)";
 	return NOT_DIVIDE;
 }

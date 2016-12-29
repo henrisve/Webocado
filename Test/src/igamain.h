@@ -15,6 +15,14 @@
 namespace webocado{
     class igacado{
     public:
+        void mutateFirst(){
+            mutate();
+            for(int i=0;i<populationSize;i++){
+                population[0][i].saveImage();
+                population[0][i].createHistogram();
+            }
+        }
+
         inline void mutate(){
             for(int i=0; i<populationSize; i++) mutate(i);
         }
@@ -83,7 +91,7 @@ namespace webocado{
             int r=(level-gaussLevel);
             return (exp(-(r*r)/gaussSigma));
         }
-
+        void calcHistDist();
 
         void mutateElementColor(bricolage::Page *mpage,bricolage::BentoBlock *bentoBlock, int ColorSize);
         inline void mutateElementColor(bricolage::Page *mpage){
@@ -130,6 +138,7 @@ namespace webocado{
         struct QPairFirstComparer{
             template<typename T1, typename T2>
             bool operator()(const QPair<T1,T2> & a, const QPair<T1,T2> & b) const{
+                if(a.first == b.first) return a.second < b.second;
                 return a.first < b.first;
             }
         };
@@ -171,7 +180,7 @@ namespace webocado{
                 //                    if(stringout.size()<2){
                 //                        newqpair.second="";
                 //                    }else{
-                newqpair.second = text;
+                newqpair.second = text;// gives text after, ex. 14px => 14,"px"
                 //  }
                 list.append(newqpair);
                 //list << rxnum.cap(1).toDouble();
@@ -179,7 +188,11 @@ namespace webocado{
             }
             return list;
         }
-
+        /*double QStr2num(const QString &str){
+            QRegExp rxnum("(-?\\d+(?:[\\.,]\\d+(?:e\\d+)?)?)");
+            rxnum.indexIn(str, 0);
+            return rxnum.cap(1).toDouble();
+        }*/
         static bool letssThan( const QString & e1, const QString & e2 ){
 
             QList<double> list1=getNumberFromQString2(e1);
@@ -207,6 +220,7 @@ namespace webocado{
         }
         double limMinMax(double value,double min,double max);
         double limMinMax(double value,QString key);
+        QList<int> sortedIndex(QList<QPair<int,int> > parentList);
     };
 }
 #endif // IGAMAIN_H
