@@ -12,6 +12,8 @@
 //class Window;
 //#include <QDebug>
 using namespace bricolage;
+#include <QTime>
+QTime myTimer3;
 
 //#####################################################################
 // Function Page
@@ -49,13 +51,12 @@ void Page::updatePage(Page &newPage,QWebElement newpart,int location){
    // newPage.webpageP->mainFrame()->documentElement().
 }
 
+
 void Page::updatePage(Page &newPage){
 
-    webpageP->mainFrame()->setHtml(newPage.getHtml());
-
+    webpageP->mainFrame()->setHtml(newPage.getHtml()); // This takes 50 ms!
     int prevs = mDOMNodes.size(); //temp
     mDOMNodes.clear();//We migth need to wait here?
-
     setDOMNodes(webpageP->mainFrame()->documentElement());
     //Now all the DOMNodes are updated to the new one
     mBentoTree->mHeight=newPage.mBentoTree->mHeight;
@@ -90,7 +91,12 @@ void Page::copyPage(BentoBlock* copyBlock,BentoBlock* orgBlock){
     copyBlock->mComputedStyles=orgBlock->mComputedStyles;
     //if(orgBlock->mLevel == 0) qDebug() << "c2" << "this:" << mBentoTree->mRootBlock->mChildren.size() << endl;
     if(copyBlock->mDomNodeID>0){ // why
-        copyBlock->mDOMNode = mDOMNodes[copyBlock->mDomNodeID];
+        if(copyBlock->mDomNodeID >= mDOMNodes.size()){
+            copyBlock->mDOMNode = mDOMNodes.last();
+            qDebug() << "Warning: mDOMNode too small, use last element. size:" << mDOMNodes.size() << " requested:" << copyBlock->mDomNodeID<< endl;
+        }else{
+            copyBlock->mDOMNode = mDOMNodes[copyBlock->mDomNodeID];
+        }
     //    if(orgBlock->mLevel == 0) qDebug() << ".";
     }else{
     //    qDebug() << "*";
@@ -104,15 +110,78 @@ void Page::copyPage(BentoBlock* copyBlock,BentoBlock* orgBlock){
     }
 }
 
+/*Note to self. it seemed that updating list and style at the same location did not
+ * increase the speed. but instead added new problems.
+ *  It migth be possible to solve somehow, but not now. so keeping it for now.
+ *
+ */
+void Page::updateStylesANDList(BentoBlock* bentoBlock){
+    myTimer3.start();
+        //somtings wronh
+    //bentoBlock->updateStyles(&ComputedStyleList);
 
-
-void Page::updateStyleList(BentoBlock* bentoBlock){
-//    if(bentoBlock->mLevel==0 && bentoBlock->mChildren.size()==0){
-//        qDebug() <<"fee";
-//    }
     QHash<QString, QString> ComputedStyles = bentoBlock->getStyles();
-    QList<QString> keys = ComputedStyles.keys();
+    QList<QString> keys2 = ComputedStyles.keys();
+    QList<QString> keys = bentoBlock->mComputedStyles.keys();
+    foreach(QString key,keys2){
+        if(!keys.contains(key)){
+            keys.append(key);
+            qDebug() << "keys: " << key << endl;
+        }
+    }
+    //Can we maybe just take the keys that have been in the mutation part? rest shouldnt change right?
+    //then we also need to find how to handle where we empty it corrertly
+    qDebug() << "a" << myTimer3.elapsed();
     foreach (QString key, keys) {
+
+
+        int kindex=bentoBlock->mComputedStyles.value(key).first;
+        if(kindex > ComputedStyleListBackup.value(key).size()){
+            qDebug() << endl << "stylelist too small, select last available instead";
+            kindex = ComputedStyleListBackup.value(key).size()-1; //I dont know why this happens sometimes.. but very rare, so ignore it
+        }
+        int styleSize=ComputedStyleListBackup.value(key).size();
+        if(kindex>=styleSize){
+            kindex=(qrand()%styleSize);//this is not correct way, but I dont care
+            qDebug() << "Warning: stylelist too small, new index:" << kindex << endl;
+        }
+
+        bentoBlock->mDOMNode.setStyleProperty(key,ComputedStyleListBackup.value(key).at(kindex) + " !important");
+
+
+
+        QString styleValue = ComputedStyles.value(key);
+        int index=addStyles(styleValue,key);
+
+        int size=ComputedStyleList.value(key).size();
+        bentoBlock->setStyles(index,key,size);
+
+    }
+
+
+    qDebug() << "b" << myTimer3.elapsed();
+
+    for(int i=0; i<bentoBlock->mChildren.size(); i++) {
+        updateStylesANDList(bentoBlock->mChildren[i]);
+    }
+}
+
+
+void Page::updateStyleList2(BentoBlock* bentoBlock,bool init){
+    QSet<QString> keys;
+
+    QHash<QString, QString> ComputedStyles = bentoBlock->getStyles();
+
+    if(init){
+        QList<QString> tmp=ComputedStyles.keys();
+        keys = QSet<QString>::fromList(tmp);
+        //keys.fromList() /fromList(ComputedStyles.keys());
+    }else{
+        keys = getUpdatedKeys();
+    }
+
+    foreach (QString key, keys) {
+
         QString styleValue = ComputedStyles.value(key);
         int index=addStyles(styleValue,key);
 
@@ -120,9 +189,11 @@ void Page::updateStyleList(BentoBlock* bentoBlock){
         bentoBlock->setStyles(index,key,size);
     }
     for(int i=0; i<bentoBlock->mChildren.size(); i++) {
-        updateStyleList(bentoBlock->mChildren[i]);
+        updateStyleList2(bentoBlock->mChildren[i],init);
     }
 }
+
+
 int Page::addStyles(QString styleValue, QString key){
     int index = -1;
     if(ComputedStyleList.contains(key)){
@@ -155,10 +226,18 @@ int Page::addStyles(QString styleValue, QString key){
     return index;
 }
 
+void Page::setUpdatedKeys(QString key){
+    updatedKeys.insert(key);
+}
+QSet<QString> Page::getUpdatedKeys(){
+    return updatedKeys;
+}
+
+
+//This is a bit "wrong", see color, think that's better solution.
 void Page::updateStyles(BentoBlock* bentoBlock){
 
-        //somtings wronh
-    bentoBlock->updateStyles(&ComputedStyleList);
+    bentoBlock->updateStyles(&ComputedStyleList,getUpdatedKeys());
 
     for(int i=0; i<bentoBlock->mChildren.size(); i++) {
         updateStyles(bentoBlock->mChildren[i]);
@@ -206,7 +285,7 @@ void Page::createHistogram(){
     //histogram = QList<QList<QList<QList<int> > > >; //X,Y,rgb,bin
     QVector<QVector<QVector<QVector<int> > > > tmphist(windows,
                                                QVector <QVector < QVector <int > > > (windows,
-                                               QVector <QVector < int > >(3,
+                                               QVector <QVector < int > >(4, //number of colors (rgb + lightness
                                                QVector <int> (bins+1, 0))));
     for(int i=0;i<image.width();i++){
         for(int j=0;j<image.height();j++){
@@ -214,6 +293,7 @@ void Page::createHistogram(){
             int r=color.red()/binLen;
             int g=color.green()/binLen;
             int b=color.blue()/binLen;
+            int gray=color.lightness()/binLen;
             for(int wi=0;wi<windows;wi++){ //is there a better way than all these loops?
                 if(i>=dist*wi && i<dist*wi+wsize){
                     for(int wj=0;wj<windows;wj++){
@@ -221,6 +301,7 @@ void Page::createHistogram(){
                             tmphist[wi][wj][0][r]++;
                             tmphist[wi][wj][1][g]++;
                             tmphist[wi][wj][2][b]++;
+                            tmphist[wi][wj][3][gray]++;
                         }
                     }
                 }
@@ -273,3 +354,4 @@ void Page::buildColorList() {
 void Page::updateColor(){
     mBentoTree->mRootBlock->updateBlockColor(&mColor);
 }
+

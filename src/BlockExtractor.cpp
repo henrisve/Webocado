@@ -258,7 +258,7 @@ int BlockExtractor::ruleSameSizeAsRoot(QWebElement& domNode) const
 	QRect domRect = DOMUtils::getGeometry(domNode);
 	float domArea = domRect.width()*domRect.height();
 	float rootArea = mRootBlock->mGeometry.width()*mRootBlock->mGeometry.height();
-    if (domArea/(1.0*rootArea)>0.95/*0.85*/) {
+    if (domArea/(1.0*rootArea)>0.85/*0.85*/) {
         if(debugThis) qDebug() << "DIVIDE (SameSizeAsRoot)";
 		return DIVIDE; 
 	}

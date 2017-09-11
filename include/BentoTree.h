@@ -20,7 +20,7 @@ class BentoTree
 public:
 	BentoBlock* mRootBlock;
 	QVarLengthArray<BentoBlock*, 50> mPostOrderList;
-    uint mNumNodes, mHeight;
+        uint mNumNodes, mHeight;
 
 public:
 	BentoTree():mRootBlock(NULL),mNumNodes(0),mHeight(0){}

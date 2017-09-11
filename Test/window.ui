@@ -551,8 +551,8 @@ csstm</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>283</width>
-          <height>1754</height>
+          <width>328</width>
+          <height>2007</height>
          </rect>
         </property>
         <layout class="QFormLayout" name="formLayout">

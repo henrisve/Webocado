@@ -1,11 +1,13 @@
+//#####################################################################
+// Copyright 2016, Henrik K. Svensson.
+// Parts of this software is using Bento, Copyright 2012, Ranjitha Kumar.
+// This software is governed by the license contained in LICENSE.
+//#####################################################################
 #include <QDebug>
 #include <QDir>
 #include <QTimer>
 #include <QDateTime>
-//#include "CutyCapt.cpp"
 #include "igamain.h"
-//#include "igamain.cpp"
-
 #include "window.h"
 #include "BentoBlock.h"
 #include "Bento.h"
@@ -13,7 +15,6 @@
 #include <QTime>
 #include <QMap>
 #include <QWebSettings>
-//#include <QDialog>
 #include <QMessageBox>
 
 using namespace bricolage;
@@ -111,6 +112,8 @@ void Window::on_pushButton_clicked(){
     settings->setAttribute(QWebSettings::JavaEnabled, false);
     settings->setAttribute(QWebSettings::JavascriptEnabled, false); //migth need this`??
 
+
+
     int urlIndex=0;
     int noPlusOne=(int)S_PopSize->value()%webURLlist.size();
     int j=1;
@@ -127,19 +130,15 @@ void Window::on_pushButton_clicked(){
             j=1;
         }
         j++;
-        //        int urlIndex;
-        //        if(pRand(0.7)){
-        //             urlIndex=i%webURLlist.size();       //if we later want random order
-        //        }else{                                   //in that case also edit iga main at 2 different places
-        //            urlIndex= qrand()%webURLlist.size(); //as it will order too.
-        //        }
+        //view->page()->setLinkDelegationPolicy( QWebPage::DelegateAllLinks );
         qDebug() << i <<": " << urlIndex << "iperpage: " <<individualPerPage << endl;
         webPageVector.append(new QWebPage);
         webPageVector.last()->setNetworkAccessManager(managerVector[0]);
         webPageVector.last()->mainFrame()->setUrl(QUrl(webURLlist[urlIndex]));
         webPageVector.last()->mainFrame()->setScrollBarPolicy( Qt::Horizontal, Qt::ScrollBarAlwaysOff );
         webPageVector.last()->mainFrame()->setScrollBarPolicy( Qt::Vertical, Qt::ScrollBarAlwaysOff );
-        webPageVector.last()->setViewportSize(QSize(1000,1000));
+        webPageVector.last()->setViewportSize(QSize(1000,1000));//Todo, 1000 thing should not be hardcoded here!
+        webPageVector.last()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
         pageId.append(urlIndex);
     }
 
@@ -183,7 +182,7 @@ void Window::on_mainWeb_1_loadFinished()
 void Window::on_timer_finished() {
 
     //Clear again?? should be possible to have at same place....
-    bentoBlockHash.clear();
+    //bentoBlockHash.clear();
     treeWidget->clear();
     treeWidget2->clear();
     ColorTable->clear();
@@ -214,61 +213,13 @@ void Window::on_timer_finished() {
         population.append(*new Page());
     }
 
-    //for testing the new merge, migth be usefule later.....
-    //    population[0]. (webPageVector[0]->mainFrame()->documentElement(),0);
-    //    QString htmll1 = webPageVector[0]->mainFrame()->documentElement().lastChild().firstChild().lastChild().toInnerXml();
-    //    QString htmll2 = webPageVector[0]->mainFrame()->documentElement().lastChild().firstChild().lastChild().toOuterXml();
-    //    qDebug()<< endl << "-----------------------------------------------------------------------------------" << endl
-    //            << htmll1
-    //            << endl << "-----------------------------------------------------------------------------------" << endl
-    //            << htmll2 << endl;
-    //    webPageVector[0]->mainFrame()->documentElement().lastChild().firstChild().lastChild().setOuterXml(htmll2);
-    //    qDebug()<< endl << "-----------------------------------------------------------------------------------" <<endl;
-    //     population[0].printList(webPageVector[0]->mainFrame()->documentElement(),0);
-    //     qDebug()<< endl << "-----------------------------------------------------------------------------------" <<endl;
-    //    webPageVector[0]->mainFrame()->documentElement().lastChild().firstChild().lastChild().setInnerXml(htmll1);
-    //    qDebug()<< endl << "-----------------------------------------------------------------------------------" <<endl;
-    //    population[0].printList(webPageVector[0]->mainFrame()->documentElement(),0);
-    //    qDebug()<< endl << "-----------------------------------------------------------------------------------" <<endl;
-
-
     for(int i=0;i<population.size();i++){ //this also take the copy part:/
         testtest(&population[i],population[i].mBentoTree->mRootBlock); //important function that deserve a real name
     }
-
-    /*
-     *
-     * These two(3) lines can copy parts of the text and stucture, but not the stylesheet
-     */
-    //QWebElement testt= population[6].mBentoTree->mRootBlock->mDOMNode.clone();//.takeFromDocument();
-    //population[0].mBentoTree->mRootBlock->mChildren[1]->mChildren[1]->mDOMNode.replace(testt);
-    //population[1].mBentoTree->mRootBlock->mDOMNode.encloseContentsWith(testt);
-    /*
-     *
-     * These two lines change the link color of an item.
-     */
-    //QString thisName=  population[0].mBentoTree->mRootBlock->mChildren[1]->mChildren[2]->mChildren[2]->mDOMNode.attribute("class");
-    //population[0].mBentoTree->mRootBlock->mChildren[1]->mChildren[2]->mChildren[2]->mDOMNode.appendInside("<style type=\"text/css\">#" + thisName + " a:link { color: #00ff00; }</style>");
-    //QDoubleSpinBox *test2 = S_ColorNew;
-
-
-
-
-    //mainWeb_1->setZoomFactor(0.5);
     qDebug() << endl << "Done, now create the iga object " << endl;
-    popBuildColorList();
     igaObject->initIgacado(&settings,&numericLimits,S_PopSize->value(),&population);
-    qDebug() << "Done, mutate first generation" << endl;
-    popUpdateColor();
-    //igaObject->mutateFirst();
-    qDebug() << "Done, create style lists" << endl;
-
-    //in some cases we need to do this?
-    //popBuildColorList();
-    popUpdateColor();
-    popBuildColorList();
+    qDebug() << "Done, update color table" << endl;
     updateColorTable();
-
     //Following is for web9
     if(tab_nine->isVisible() && webPageVector.size()>=9){
         qDebug() << "Done" << endl << "create web9" << endl;
@@ -311,6 +262,7 @@ void Window::on_timer_finished() {
 
 //#####################################################################
 // Function examineChildElements
+// Remove this?
 //#####################################################################
 void Window::examineChildElements(const BentoBlock* bentoBlock, QTreeWidgetItem* parentItem)
 {
@@ -326,177 +278,19 @@ void Window::examineChildElements(const BentoBlock* bentoBlock, QTreeWidgetItem*
     for(uint i=0; i<(uint)bentoBlock->mChildren.size(); i++) examineChildElements(bentoBlock->mChildren[i], item);
 }
 
-//#####################################################################
-// Function BuildColorlist
-// For each kid, put its color in the higest mcolor, and 
-// then link to this with a pointer, i.e if changed in the
-// main mcolor all the ones under change too
-//#####################################################################
-void Window::popBuildColorList() {
-    //for(int i=0;i<population.size()/2;i++){ //change to popsize
-       //population[i].updateStyleList();
-       //population[i].buildColorList();
-    //}
-}
-void Window::popUpdateColor() {
-    //for(int i=0;i<population.size()/2;i++){
-      //population[i].updateColor();
-      //population[i].updateStyles();
-    //}
-}
-/*void Window::buildColorList(Page *mPage) {                    // MOVED TO PAGE.CPP
-    //mPage->ComputedStyleList.clear();
-    if(pRand()){ //Todo:add parameter for this on the gui
-        mPage->mColor.clear();
-    }
-    if(mPage->mColor.empty()){
-        QColor tranp;
-        tranp.setRgb(0,0,0,0);
-        mPage->mColor.append(tranp);
-    }
-    buildColorList(mPage->mBentoTree->mRootBlock,&mPage->mColor);
-}*/
-
-
-/*
-void Window::buildColorList(BentoBlock *bentoBlock,QVector<QColor>* colorList){ //Move to bentoblock?
-    // These could be inserted later, but not really important?
-    //"border-right-color"
-    //"border-top-color"
-    //"text-line-through-color"
-    //"text-overline-color"
-    //"text-underline-color"
-    //"border-left-color"
-    //"border-bottom-color"
-
-
-    //under this is the old, keep until it works
-
-    QColor bg= DOMUtils::parseColorFeature(bentoBlock->mDOMNode.styleProperty("background-color", QWebElement::ComputedStyle));
-    QColor co= DOMUtils::parseColorFeature(bentoBlock->mDOMNode.styleProperty("color", QWebElement::ComputedStyle));
-    QColor link= DOMUtils::parseColorFeature(bentoBlock->mDOMNode.findFirst("a").styleProperty("color", QWebElement::ComputedStyle));    //Skip other types of links, the users will probably not check that anyway, and will be too much
-    QColor outline= DOMUtils::parseColorFeature(bentoBlock->mDOMNode.styleProperty("outline-color", QWebElement::ComputedStyle));
-    QColor border= DOMUtils::parseColorFeature(bentoBlock->mDOMNode.styleProperty("border-color", QWebElement::ComputedStyle));
-
-
-    addColor(bentoBlock->mbgColor,colorList, bg);
-    addColor(bentoBlock->mtColor, colorList, co);
-    addColor(bentoBlock->mborderColor, colorList, border);
-    addColor(bentoBlock->moutlineColor, colorList, outline);
-    addColor(bentoBlock->mlinkColor, colorList, link);
-
-    for(int i=0; i<bentoBlock->mChildren.size(); i++) {
-        buildColorList(bentoBlock->mChildren[i],colorList);
-    }
-}*/
-
-//This should be in the bentoblock file!
-/*void Window::addColor(int &colorBlock,QVector<QColor>* colorList, QColor newColor){
-    if(newColor.alpha()==0){
-        colorBlock=0;
-    }
-    int index=colorIndex(colorList, newColor);
-    if(index<0){
-        colorList->append(newColor);
-        colorBlock=colorList->size()-1;//&colorList->back();
-    }else{
-        colorBlock=index;//&temp->back();
-    }
-}*/
 
 //#####################################################################
-// Function colorIndex
-// Return the index of the color of a list.
-// returns -1 if not found
 //#####################################################################
-/*int Window::colorIndex(QVector<QColor>* colorList, QColor color){
-    int index=-1;
-
-    for(uint i=0;i<colorList->size();i++){
-        if(colorList->at(i).name()==color.name()){
-            index=i;
-            break;
-        }
-    }
-    return index;
-}*/
-
-
-/*void Window::updateColor(BentoBlock *bentoBlock,QVector<QColor>* colorList) {
-    //    bentoBlock->mDOMNode.classes();
-
-    //TODOCOLOR
-
-    //We better handle this somewhere else!
-    if(bentoBlock->mtColor >= colorList->size())
-        bentoBlock->mtColor=0; //TODO Add new color??? or how to do here??
-    if(bentoBlock->mbgColor >= colorList->size())
-        bentoBlock->mbgColor=0; //TODO Add new color??? or how to do here??
-    if(bentoBlock->mlinkColor >= colorList->size())
-        bentoBlock->mlinkColor=0;
-    if(bentoBlock->mborderColor >= colorList->size())
-        bentoBlock->mborderColor=0;
-    if(bentoBlock->moutlineColor >= colorList->size())
-        bentoBlock->moutlineColor=0;
-
-
-    //Variables holding the colors
-    QColor textColor = colorList->at(bentoBlock->mtColor);
-    QColor bgColor = colorList->at(bentoBlock->mbgColor);
-    QColor border = colorList->at(bentoBlock->mborderColor);
-    QColor outline = colorList->at(bentoBlock->moutlineColor);
-    QColor link = colorList->at(bentoBlock->mlinkColor);
-
-
-
-    //Sets the colors
-    bentoBlock->mDOMNode.setStyleProperty("color",DOMUtils::qColor2RGBStr(textColor));
-    bentoBlock->mDOMNode.setStyleProperty("background-color",DOMUtils::qColor2RGBStr(bgColor));
-    bentoBlock->mDOMNode.setStyleProperty("outline-color",DOMUtils::qColor2RGBStr(outline));
-    bentoBlock->mDOMNode.setStyleProperty("border-color",DOMUtils::qColor2RGBStr(border));
-    foreach(QWebElement element,bentoBlock->mDOMNode.findAll("a")){
-        element.setStyleProperty("color",DOMUtils::qColor2RGBStr(link));
-    }
-    //    bentoBlock->mDOMNode.setStyleProperty("a:link color",DOMUtils::qColor2RGBStr(linkColor));
-
-    for (int i=0; i<bentoBlock->mChildren.size(); i++) {
-        updateColor(bentoBlock->mChildren[i],colorList);
-    }
-}*/
-
-
-
-
-//void bricolage::Window::on_fitnessSlider_sliderReleased(){
-//    qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
-//    setEnabled(false);
-
-//    qDebug()<<"new Vote! Slider" << fitnessSlider->value() << endl;
-//    igaObject->nextIndividual(double(fitnessSlider->value())/100);
-//    if(igaObject->currIndividial==0){
-//        qDebug() << "new gen update colors:" << endl;
-//        popUpdateColor();
-//        popBuildColorList();
-//        updateColorTable();
-//    }
-//    mainWeb_1->setPage(population[igaObject->currIndividial].webpageP);
-//    qDebug() << "Done, your turn!" << endl;
-//    myTimer.start();
-
-//    htmlView->document()->setPlainText(population[igaObject->currIndividial].getHtml());
-//    treeWidget->clear();
-//    examineChildElements(population[igaObject->currIndividial].mBentoTree->mRootBlock, treeWidget->invisibleRootItem());
-//    qApp->restoreOverrideCursor();
-//    setEnabled(true);
-//}
 void Window::on_button_dislike_clicked(){
     button_vote(false);
 }
-
 void bricolage::Window::on_button_like_clicked(){
     button_vote(true);
 }
-
+//#####################################################################
+// Function buttonvote
+// runs when one of the two vote buttons is clicked
+//#####################################################################
 void Window::button_vote(bool liked){
     QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
     if(runFlag) return;
@@ -515,14 +309,7 @@ void Window::button_vote(bool liked){
     if(igaObject->currIndividial==0){
         addNewGenAncestryTree();
         addToHtmlDistance();
-        //int t=myTimer.elapsed();
-        //qDebug() << "new gen update colors:" << endl << myTimer.elapsed()-t;
-        //popUpdateColor();
-                //qDebug() << "popUpdateColor();" << endl << myTimer.elapsed()-t;
-        //popBuildColorList();
-                //qDebug() << "popBuildColorList()" << endl << myTimer.elapsed()-t;
         updateColorTable();
-                //qDebug() << "updateColorTable();" << endl << myTimer.elapsed()-t;
     }
     //adds visible text of the stylelist to gui
     StyleListTextboxOld->clear(); //todo, first plan was old should be prev. generation.. probably not that important..
@@ -574,8 +361,11 @@ void Window::updateColorTable(){
     }
 }
 
+//#####################################################################
+// Function ????
 //now this is an important thing, change name! also, move to page.cpp
 //Sorts up the domnodes or something...
+//#####################################################################
 void Window::testtest(Page *mpage, BentoBlock* bentoBlock){
     bentoBlock->mDomNodeID=-1; //TODO, migth be a problem?
 
@@ -593,100 +383,96 @@ void Window::testtest(Page *mpage, BentoBlock* bentoBlock){
     }
 }
 
+//#####################################################################
+// Function eventfilter
+// Handles all events and choose what to do with them.
+//#####################################################################
 bool Window::eventFilter(QObject *object, QEvent *event){
+    if(event->type() == QEvent::ContextMenu){
+        qDebug("testt");
+        QContextMenuEvent* mevent = static_cast<QContextMenuEvent *>(event);
+        if(mevent->reason() == QContextMenuEvent::Mouse) {
+            qDebug("I have blocked the context menu.");
+            return true;
+        } else return QObject::eventFilter(object, event);
+    }
+
+
     if(runFlag) return false; //true=ignore it, i.e
     runFlag =true;
-    if (object == Web9_1 && event->type() == QEvent::MouseButtonPress) {
+    if(event->type() == QEvent::ContextMenu){
+        QContextMenuEvent* mevent = static_cast<QContextMenuEvent *>(event);
+        if(mevent->reason() == QContextMenuEvent::Mouse) {
+            qDebug("I have blocked the context menu.");
+            return true;
+        } else return QObject::eventFilter(object, event);
+    }
+    if(event->type() == QEvent::MouseButtonPress){
+        QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
+        bool isRight = mouseEvent->button()==Qt::RightButton;//2; //
 
-        QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
-
-        //qDebug()<<"woop1";
-        //Web9_1->setZoomFactor(1);
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        Web9_1->setPage(nineNumberPage[nineCounter]);
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        //Web9_1->setZoomFactor(1);
-        nineNewClick(nineList[0]);
-    }
-    if (object == Web9_2 && event->type() == QEvent::MouseButtonPress) {
-        QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
-        //qDebug()<<"woop2";
-        //Web9_2->setZoomFactor(1);
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        Web9_2->setPage(nineNumberPage[nineCounter]);
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        //Web9_2->setZoomFactor(1);
-        nineNewClick(nineList[1]);
-    }
-    if (object == Web9_3 && event->type() == QEvent::MouseButtonPress) {
-        QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
-        //qDebug()<<"woop3";
-        //Web9_3->setZoomFactor(1);
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        Web9_3->setPage(nineNumberPage[nineCounter]);
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        //Web9_3->setZoomFactor(1);
-        nineNewClick(nineList[2]);
-    }
-    if (object == Web9_4 && event->type() == QEvent::MouseButtonPress) {
-        QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
-        //qDebug()<<"woop4";
-        //Web9_4->setZoomFactor(1);
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        Web9_4->setPage(nineNumberPage[nineCounter]);
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        //Web9_4->setZoomFactor(1);
-        nineNewClick(nineList[3]);
-    }
-    if (object == Web9_5 && event->type() == QEvent::MouseButtonPress) {
-        QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
-        //qDebug()<<"woop5";
-        //Web9_5->setZoomFactor(1);
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        Web9_5->setPage(nineNumberPage[nineCounter]);
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        //Web9_5->setZoomFactor(1);
-        nineNewClick(nineList[4]);
-    }
-    if (object == Web9_6 && event->type() == QEvent::MouseButtonPress) {
-        QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
-        //qDebug()<<"woop6";
-        //Web9_6->setZoomFactor(1);
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        Web9_6->setPage(nineNumberPage[nineCounter]);
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        //Web9_6->setZoomFactor(1);
-        nineNewClick(nineList[5]);
-    }
-    if (object == Web9_7 && event->type() == QEvent::MouseButtonPress) {
-        QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
-        //qDebug()<<"woop7";
-        //Web9_7->setZoomFactor(1);
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        Web9_7->setPage(nineNumberPage[nineCounter]);
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        //Web9_7->setZoomFactor(1);
-        nineNewClick(nineList[6]);
-    }
-    if (object == Web9_8 && event->type() == QEvent::MouseButtonPress) {
-        QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
-        //qDebug()<<"woop8";
-        //Web9_8->setZoomFactor(1);
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        Web9_8->setPage(nineNumberPage[nineCounter]);
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        //Web9_8->setZoomFactor(1);
-        nineNewClick(nineList[7]);
-    }
-    if (object == Web9_9 && event->type() == QEvent::MouseButtonPress) {
-        QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
-        //qDebug()<<"woop9";
-        //Web9_9->setZoomFactor(1);
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        Web9_9->setPage(nineNumberPage[nineCounter]);
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-        //Web9_9->setZoomFactor(1);
-        nineNewClick(nineList[8]);
+        if (object == Web9_1) {
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+            Web9_1->setPage(nineNumberPage[nineCounter]);
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+            nineNewClick(nineList[0],isRight);
+        }
+        if (object == Web9_2) {
+            //QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+            Web9_2->setPage(nineNumberPage[nineCounter]);
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+            nineNewClick(nineList[1],isRight);
+        }
+        if (object == Web9_3) {
+            //QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+            Web9_3->setPage(nineNumberPage[nineCounter]);
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+            nineNewClick(nineList[2],isRight);
+        }
+        if (object == Web9_4 && event->type() == QEvent::MouseButtonPress) {
+            //QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+            Web9_4->setPage(nineNumberPage[nineCounter]);
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+            nineNewClick(nineList[3],isRight);
+        }
+        if (object == Web9_5 && event->type() == QEvent::MouseButtonPress) {
+            //QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+            Web9_5->setPage(nineNumberPage[nineCounter]);
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+            nineNewClick(nineList[4],isRight);
+        }
+        if (object == Web9_6 && event->type() == QEvent::MouseButtonPress) {
+            //QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+            Web9_6->setPage(nineNumberPage[nineCounter]);
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+            nineNewClick(nineList[5],isRight);
+        }
+        if (object == Web9_7 && event->type() == QEvent::MouseButtonPress) {
+            //QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+            Web9_7->setPage(nineNumberPage[nineCounter]);
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+            nineNewClick(nineList[6],isRight);
+        }
+        if (object == Web9_8 && event->type() == QEvent::MouseButtonPress) {
+            //QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+            Web9_8->setPage(nineNumberPage[nineCounter]);
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+            nineNewClick(nineList[7],isRight);
+        }
+        if (object == Web9_9 && event->type() == QEvent::MouseButtonPress) {
+            //QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+            Web9_9->setPage(nineNumberPage[nineCounter]);
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
+            nineNewClick(nineList[8],isRight);
+        }
     }
     if (object == fitnessSlider && event->type() == QEvent::MouseButtonRelease) {
         QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
@@ -702,8 +488,6 @@ bool Window::eventFilter(QObject *object, QEvent *event){
             qDebug() << "new gen update colors:" << endl;
             addNewGenAncestryTree();
             addToHtmlDistance();
-            //popUpdateColor();
-            //popBuildColorList();
             updateColorTable();
         }
         mainWeb_1->setPage(population[igaObject->currIndividial].webpageP);
@@ -725,34 +509,91 @@ bool Window::eventFilter(QObject *object, QEvent *event){
     // return true
 
 }
-void Window::nineNewClick(int id){ //id=popid, todo: change varname
+//#####################################################################
+// Function nineNewClick
+// This function runs after user clicked one of the 9 pages.
+//#####################################################################
+void Window::nineNewClick(int id,bool isRight){ //id=popid, todo: change varname
+    qDebug()<<"you choose " << id << ", the following got new score: ";
+    qDebug() << endl;
+    for(int i=0;i<igaObject->popSize();i++){
+        qDebug() << i << "\t|  ";
+
+    }
+    qDebug() << endl;
+    for(int i=0;i<igaObject->popSize();i++){
+        if(nineFitness.contains(i)){
+            int tmpp=nineFitness[i]*100;
+
+            qDebug() << tmpp << "\t|";
+        }else{
+            qDebug() << "NaN" << "\t|";
+        }
+    }
     QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
     nineCounter++;
     int noOfNN=0;
-    qDebug()<<"you choose " << id << ", the following got new score: ";
+    QVector<int> testNN;
+    QVector<int> testdist;
+
     for(int i=0;i<igaObject->popSize();i++){
-        double fitness=population[id].distanceMulti[i];
-        if(fitness!=1) fitness-=0.2; //-0.2, even if very similar, we dont want unselected to get approx the same value as those selected
-        if(pRand(fitness)){//fitness>qrand()){
+        double dist=population[id].distanceMulti[i]; //todo, try change so "0" is 0.5, and add right click?
+        double fitness=0.5 + (isRight?-1:1)*dist/2;
+        testdist.append(dist > -5 ? dist*100 : -600);
+        //if(dist!=1) fitness-=0.2; //-0.2, even if very similar, we dont want unselected to get approx the same value as those selected
+        if(pRand(dist)){//fitness>qrand()){
+            testNN.append(i);
             noOfNN++;
+
             if(nineFitness.contains(i)){
                 nineFitness[i]=(nineFitness[i]+fitness)/2;//(nineFitness[i]*(2-fitness)+fitness)/2;
             }else{
                 nineFitness[i]=fitness;
             }
-            qDebug() << i << "now have " << nineFitness[i] <<" new:(" << fitness << ")";
+            //qDebug() << i << "("<<dist<<"): ";//" now have " << nineFitness[i] <<" new:(" << fitness << ")";
         }
     }
-    qDebug() << " (" << noOfNN << " nn)";
+    qDebug() << endl;//" (" << noOfNN << " nn)";
     if(nineCounter>=1){//before I used to select all 9 in order, now just one, the rest is considered to be bad.
-        qDebug() << endl << "the individs not selected got 0";
+        //qDebug() << endl << "the individs not selected get 0.5 with probability p0";
         for(int i=0;i<9;i++){
-            if(!nineFitness.contains(nineList[i])){
-                nineFitness[nineList[i]]=0;
-            }else{
-                nineFitness[nineList[i]]/=2;
+            if(pRand(0.9) && nineList[i] != id){ //why doing this for the one choosen? because fuck you choosen one... ?
+                if(!nineFitness.contains(nineList[i])){
+                    nineFitness[nineList[i]]=0.5;
+                }else{
+                    nineFitness[nineList[i]]=(nineFitness[nineList[i]]+0.5)/2;
+                }
             }
-            qDebug() << " : "<< i << "now have" << nineFitness[nineList[i]] ;
+            //qDebug() << " : "<< nineList[i] << "now have" << nineFitness[nineList[i]] ;
+        }
+
+        qDebug() << endl;
+        for(int i=0;i<igaObject->popSize();i++){
+            if(nineFitness.contains(i)){
+                int tmpp=nineFitness[i]*100;
+
+                qDebug() << tmpp << "\t|";
+            }else{
+                qDebug() << "NaN" << "\t|";
+            }
+        }
+        qDebug() << endl;
+        for(int i=0;i<igaObject->popSize();i++){
+            if(i==id){
+                qDebug() << (isRight?"R":"L") << "\t| ";
+            }else if(nineList.contains(i) && testNN.contains(i)){
+                qDebug() << "N9N" << "\t| ";
+            }else if(nineList.contains(i)){
+                qDebug() << "9" << "\t| ";
+            }else if(testNN.contains(i)){
+                qDebug() << "NN" << "\t| ";
+            }else{
+                qDebug() << "  " << "\t| ";
+            }
+        }
+        qDebug() << endl;
+        for(int i=0;i<igaObject->popSize();i++){
+            qDebug() << testdist[i] << "\t|";
         }
         qDebug() << endl << nineFitness.size() << "out of" << igaObject->popSize() << "is selected" << endl;
         nineCounter=0;
@@ -773,8 +614,6 @@ void Window::nineNewClick(int id){ //id=popid, todo: change varname
             addNewGenAncestryTree();
             addToHtmlDistance();
             qDebug()<<"new generation" << endl;
-            //popUpdateColor();
-            //popBuildColorList();
             updateColorTable();
             nineFitness.clear();
             QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
@@ -787,9 +626,11 @@ void Window::nineNewClick(int id){ //id=popid, todo: change varname
         }
         nineGenerateNew();
     }
-    //qDebug()<< "ninecounter" << nineCounter << "fitsize" << nineFitness.size();
-
 }
+//#####################################################################
+// Function nineGenerateNew
+// takes 9 individual for the 3x3 selection
+//#####################################################################
 void Window::nineGenerateNew(){
     nineList.clear();
     for(int i = 0; i < 9; i++){
@@ -811,14 +652,14 @@ void Window::nineGenerateNew(){
             noSame = maxfit==1 && pRand(0.95);
             preferNear = pRand(1-maxfit) && pRand(0.95);
             preferNew = nineFitness.contains(r) && pRand();
-            if(maxfit==1){
+            /*if(maxfit==1){
                 qDebug() << endl << r << " exact copy exist in the 9";
                 if(noSame) qDebug() << "but ok this time";
             }
             if(preferNear)
                 qDebug() <<endl << "with a value of" << maxfit << "," << r << "was too close this time";
             if(preferNew)
-                qDebug() << endl << r << " was selected before, 50% chance of be picked, so no luck this time";
+                qDebug() << endl << r << " was selected before, 50% chance of be picked, so no luck this time";*/
         }while(noSame || preferNear || preferNew);//(maxfit==1 && pRand(0.95)) || pRand(0.55-(maxfit/2) || nineFitness.contains(r) && pRand()));
         //If maxfit is 1(i.e exact copy of one we already have, only have a small chance to pick it(this is due to
         //in some cases when most of the population is the same, we migth have no other candidates.(should instead
@@ -849,16 +690,6 @@ void Window::nineGenerateNew(){
         nineList.append(r);
     }
     qDebug() << "9 new selected!" << nineList;
-    /*QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-    Web9_1->setZoomFactor(1);
-    Web9_2->setZoomFactor(1);
-    Web9_3->setZoomFactor(1);
-    Web9_4->setZoomFactor(1);
-    Web9_5->setZoomFactor(1);
-    Web9_6->setZoomFactor(1);
-    Web9_7->setZoomFactor(1);
-    Web9_8->setZoomFactor(1);
-    Web9_9->setZoomFactor(1);*/
     QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
     Web9_1->setPage(webPageVector[nineList[0]]);
     Web9_2->setPage(webPageVector[nineList[1]]);
@@ -869,55 +700,12 @@ void Window::nineGenerateNew(){
     Web9_7->setPage(webPageVector[nineList[6]]);
     Web9_8->setPage(webPageVector[nineList[7]]);
     Web9_9->setPage(webPageVector[nineList[8]]);
-    /*QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-    Web9_1->setZoomFactor(1);
-    Web9_2->setZoomFactor(1);
-    Web9_3->setZoomFactor(1);
-    Web9_4->setZoomFactor(1);
-    Web9_5->setZoomFactor(1);
-    Web9_6->setZoomFactor(1);
-    Web9_7->setZoomFactor(1);
-    Web9_8->setZoomFactor(1);
-    Web9_9->setZoomFactor(1);
     QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-
-    Web9_1->setZoomFactor(0.5);
-    Web9_2->setZoomFactor(0.5);
-    Web9_3->setZoomFactor(0.5);
-    Web9_4->setZoomFactor(0.5);
-    Web9_5->setZoomFactor(0.5);
-    Web9_6->setZoomFactor(0.5);
-    Web9_7->setZoomFactor(0.5);
-    Web9_8->setZoomFactor(0.5);
-    Web9_9->setZoomFactor(0.5);*/
-    QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
-    QString path1=QDir::currentPath() + "/img" + dateTime + "/" + igaObject->getCurrIName(nineList[0]) + ".png";
-    QString path2=QDir::currentPath() + "/img" + dateTime + "/" + igaObject->getCurrIName(nineList[1]) + ".png";
-    QString path3=QDir::currentPath() + "/img" + dateTime + "/" + igaObject->getCurrIName(nineList[2]) + ".png";
-    QString path4=QDir::currentPath() + "/img" + dateTime + "/" + igaObject->getCurrIName(nineList[3]) + ".png";
-    QString path5=QDir::currentPath() + "/img" + dateTime + "/" + igaObject->getCurrIName(nineList[4]) + ".png";
-    QString path6=QDir::currentPath() + "/img" + dateTime + "/" + igaObject->getCurrIName(nineList[5]) + ".png";
-    QString path7=QDir::currentPath() + "/img" + dateTime + "/" + igaObject->getCurrIName(nineList[6]) + ".png";
-    QString path8=QDir::currentPath() + "/img" + dateTime + "/" + igaObject->getCurrIName(nineList[7]) + ".png";
-    QString path9=QDir::currentPath() + "/img" + dateTime + "/" + igaObject->getCurrIName(nineList[8]) + ".png";
-
-    /*QPixmap imgtmp1 = QPixmap::grabWindow(Web9_1->winId()).scaledToWidth(200);
-    QPixmap imgtmp2 = QPixmap::grabWindow(Web9_2->winId()).scaledToWidth(200);
-    QPixmap imgtmp3 = QPixmap::grabWindow(Web9_3->winId()).scaledToWidth(200);
-    QPixmap imgtmp4 = QPixmap::grabWindow(Web9_4->winId()).scaledToWidth(200);
-    QPixmap imgtmp5 = QPixmap::grabWindow(Web9_5->winId()).scaledToWidth(200);
-    QPixmap imgtmp6 = QPixmap::grabWindow(Web9_6->winId()).scaledToWidth(200);
-    QPixmap imgtmp7 = QPixmap::grabWindow(Web9_7->winId()).scaledToWidth(200);
-    QPixmap imgtmp8 = QPixmap::grabWindow(Web9_8->winId()).scaledToWidth(200);
-    QPixmap imgtmp9 = QPixmap::grabWindow(Web9_9->winId()).scaledToWidth(200);
-
-    if(!imgtmp1.save(path1) || !imgtmp2.save(path2) || !imgtmp3.save(path3) || !imgtmp4.save(path4)){
-        qDebug() << "could not save files1";
-    }
-    if(!imgtmp5.save(path5) || !imgtmp6.save(path6) || !imgtmp7.save(path7) || !imgtmp8.save(path8) || !imgtmp9.save(path9) ){
-        qDebug() << "could not save files2";
-    }*/
 }
+//#####################################################################
+// Function init
+// init some settings and stuff
+//#####################################################################
 void Window::init(){
     fitnessSlider->installEventFilter(this);
     settings.insert("S_ColorCross",S_ColorCross);
@@ -956,6 +744,10 @@ void Window::init(){
     settings.insert("S_Selective_Mut_Other",S_Selective_Mut_Other);
 
 }
+//#####################################################################
+// Function saveToIni
+//This function will save the settings to ini
+//#####################################################################
 bool Window::saveToIni(){
     QFile file("webocado.ini");
     if (file.open(QIODevice::ReadWrite)) {
@@ -976,7 +768,10 @@ bool Window::saveToIni(){
         }
     }
 }
-
+//#####################################################################
+// Function readini
+// Reads settings
+//#####################################################################
 bool Window::readini(){
     QFile file("webocado.ini");
 
@@ -1022,6 +817,11 @@ bool Window::readini(){
 
     return true;
 }
+
+//#####################################################################
+// Function closeEvent
+// What to do when user try to close the application
+//#####################################################################
 void Window::closeEvent(QCloseEvent *event){
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, "Exit?", "Do you want to save settings before exit?",
@@ -1038,6 +838,10 @@ void Window::closeEvent(QCloseEvent *event){
         event->ignore();
     }
 }
+
+//#####################################################################
+// Functions for Distance visualizer
+//#####################################################################
 void Window::initHtmlDistance(){
     QString header = "<!doctype html>\n<html lang=\"en\">"
              "<head>\n<meta charset=\"utf-8\">\n<title>The HTML5 Herald</title>\n"
@@ -1061,26 +865,52 @@ void Window::addToHtmlDistance(){
     QString newhtml="<div id=\"wrapper\">";
     for(int i=0;i<igaObject->popSize();i++){
         newhtml+="<div id=\"wrapper\">";
-        newhtml+="<img src=\"" + igaObject->getCurrIName(i) + ".png\" style=\"width:"+QString::number(imgWidth)+"px;\"> : ";
+        newhtml+="my<img src=\"" + igaObject->getCurrIName(i) + ".png\" style=\"width:"+QString::number(imgWidth)+"px;\"> : ";
         QList<QPair<double,int> > dList;
+        QList<QPair<double,int> > dListemd;
         for(int j=0;j<igaObject->popSize();j++){
             if(j==i) continue;
-            double dist=population[i].distance[j];
-            if(dist>0){
+            double dist=population[i].distanceMulti[j];
+            //if(dist>0){
                 dList.append(qMakePair(dist,j));
-            }
+            //}
         }
         qSort(dList.begin(), dList.end(), QPairFirstComparer());
+
         for(int id=dList.size()-1;id>=0;id--){
 
             QString cname="myCanvas"+ QString::number(igaObject->getCurrGen()) + "a" +QString::number(id)+"a" +QString::number(i);
             double fitn=dList[id].first;
-            newhtml += "<img src=\"" + igaObject->getCurrIName(dList[id].second) + ".png\" style=\"width:"+QString::number(imgWidth-9)+"px;\">"
+            newhtml += QString::number(fitn,'g',3)+"<img src=\"" + igaObject->getCurrIName(dList[id].second) + ".png\" style=\"width:"+QString::number(imgWidth-9)+"px;\" title=\"" + QString::number(fitn) + "\">"
                        "<canvas id=\""+ cname +"\" width=\"5\" height=\""+barHigthstr+"\"></canvas><script>var ca = document.getElementById('"+ cname +"');"
                        "var ct = ca.getContext('2d');ct.beginPath();ct.rect(0, "+barHigthstr+",5, " + QString::number(-fitn*barHigth)+ ")"
                        ";ct.fillStyle = 'red';ct.fill();ct.stroke();</script>\n";
         }
          newhtml+= "</div><br />";
+         //For OMD TEST
+         //Temp for emd test
+         for(int j=0;j<igaObject->popSize();j++){
+             if(j==i) continue;
+             double dist=population[i].distance[j];
+             //if(dist>0){
+                 dListemd.append(qMakePair(dist,j));
+             //}
+         }
+
+         qSort(dListemd.begin(), dListemd.end(), QPairFirstComparer());
+
+         newhtml+="<div id=\"wrapper\">";
+         newhtml+="emd<img src=\"" + igaObject->getCurrIName(i) + ".png\" style=\"width:"+QString::number(imgWidth)+"px;\"> : ";
+         for(int id=dListemd.size()-1;id>=0;id--){
+
+             QString cname="myCanvas"+ QString::number(igaObject->getCurrGen()) + "b" +QString::number(id)+"b" +QString::number(i);
+             double fitn=dListemd[id].first;
+             newhtml += QString::number(fitn,'g',3)+"<img src=\"" + igaObject->getCurrIName(dListemd[id].second) + ".png\" style=\"width:"+QString::number(imgWidth-9)+"px;\" title=\"" + QString::number(fitn) + "\">"
+                        "<canvas id=\""+ cname +"\" width=\"5\" height=\""+barHigthstr+"\"></canvas><script>var ca = document.getElementById('"+ cname +"');"
+                        "var ct = ca.getContext('2d');ct.beginPath();ct.rect(0, "+barHigthstr+",5, " + QString::number(-fitn*barHigth)+ ")"
+                        ";ct.fillStyle = 'red';ct.fill();ct.stroke();</script>\n";
+         }
+         //To here
     }
     newhtml+= "</div><br />---------------<br />";
 
@@ -1093,7 +923,9 @@ void Window::addToHtmlDistance(){
     }
     file.close();
 }
-
+//#####################################################################
+// Functios for the tree html file
+//#####################################################################
 void Window::initAncestryTree(){
     QString header = "<!doctype html>\n<html lang=\"en\">"
              "<head>\n<meta charset=\"utf-8\">\n<title>The HTML5 Herald</title>\n"

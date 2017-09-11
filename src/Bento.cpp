@@ -4,9 +4,9 @@
 //#####################################################################
 //#include <opencv2/opencv.hpp>
 //#include <opencv2/highgui/highgui.hpp>
-#include <algorithm>
-#include <QByteArray>
-#include <QDebug>
+//#include <algorithm>
+//#include <QByteArray>
+//#include <QDebug>
 #include <QWebFrame>
 #include <QFile>
 #include <QList>
@@ -34,7 +34,7 @@ void Bento::computeBentoTree(BentoTree& bentoTree)
 	
 
 	QWebElement body = mBrowserDocument.findFirst("body");
-	BentoBlock* rootBlock = new BentoBlock(body);
+    BentoBlock* rootBlock = new BentoBlock(body);
 
     blockExtractionPass(rootBlock);
 	bentoTree.init(rootBlock);

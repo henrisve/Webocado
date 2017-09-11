@@ -1,5 +1,7 @@
 //#####################################################################
-// Copyright 2012, Ranjitha Kumar.
+// Copyright 2016, Henrik K. Svensson.
+//
+// Parts of this software is using Bento, Copyright 2012, Ranjitha Kumar.
 // This software is governed by the license contained in LICENSE.
 //#####################################################################
 #include <QApplication>
@@ -10,7 +12,7 @@
 
 void customHandler(QtMsgType type, const char* msg);
 
-using namespace bricolage;
+
 int main(int argc, char *argv[]){
 
     QTime now = QTime::currentTime();
@@ -19,7 +21,7 @@ int main(int argc, char *argv[]){
 
     QApplication app(argc, argv);
 
-    Window window;
+    bricolage::Window window;
     window.init();
     window.readini();
     window.show();

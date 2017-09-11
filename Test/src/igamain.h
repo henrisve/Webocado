@@ -5,36 +5,29 @@
 #include <QList>
 #include <QDoubleSpinBox>
 #include <random>
-#include <QDebug>
-
 #include "Page.h"
-
+//#include "BentoBlock.h"
 //#include "window.h" //Only for test as i cant seem to fix the linkage for changecolor()
 
 
 namespace webocado{
     class igacado{
     public:
-        void mutateFirst(){
-            mutate();
-            for(int i=0;i<populationSize;i++){
-                population[0][i].saveImage();
-                population[0][i].createHistogram();
-            }
-        }
+        //public Variable
+        int currIndividial;
 
+        //Public function
+        igacado();
+        void initIgacado(QHash<QString,QDoubleSpinBox*> *set, QHash<QString,QList<double> > *numericLimits, int popSize, QList<bricolage::Page> *pop);
+
+        void mutateFirst();
         inline void mutate(){
             for(int i=0; i<populationSize; i++) mutate(i);
         }
         void mutate(int i);
         void mutateColor(int i);
         void crossover();
-        void nextIndividual(double fitness);//bool like,int time);
-        //void userVote(bool like,int time);
-        igacado(/*float mR, float cR, int popSize, float tSelectPara, int tSize, int numGen, int eCopies, QList<bricolage::Page> *pop*/);
-        void initIgacado(QHash<QString,QDoubleSpinBox*> *set,QHash<QString,QList<double> > *numericLimits, int popSize, QList<bricolage::Page> *pop);
-        //void igaMainf(QList<bricolage::Page>, igaSettings settings);
-        int currIndividial;
+        void nextIndividual(double fitness);
         inline bool pRand(double probability=0.5){ return (double)rand()/RAND_MAX < probability;}
         void testtest(QWebElement domNode, QWebElement newNode);
         int popSize(){
@@ -44,7 +37,7 @@ namespace webocado{
             return population[0][ind].pID;
         }
         QString getCurrIName(){
-            return population[0][currIndividial].pID; //For backward compability, remove later
+            return population[0][currIndividial].pID;
         }
         int getCurrGen(){
             return currGeneration;
@@ -60,16 +53,14 @@ namespace webocado{
             return fitnessList[index];
         }
 
+    //just for test, remove later
+        bricolage::BentoBlock *rblock(bricolage::BentoBlock* block){
+            return rblock(block, block);
+        }
 
+        bricolage::BentoBlock *rblock(bricolage::BentoBlock* block, bricolage::BentoBlock *parent);
 
     private:
-        static const QStringList positionKeyList;
-        static const QStringList sizeKeyList;
-        static const QStringList textKeyList;
-        static const QStringList otherKeyList;
-        static const QStringList borderKeyList;
-        static const QStringList colorKeyList;
-        //and here shold be color if we did that same way...
 
         //private function
         QStringList getEvolKeys();
@@ -92,17 +83,29 @@ namespace webocado{
             return (exp(-(r*r)/gaussSigma));
         }
         void calcHistDist();
-
-        void mutateElementColor(bricolage::Page *mpage,bricolage::BentoBlock *bentoBlock, int ColorSize);
-        inline void mutateElementColor(bricolage::Page *mpage){
-            mutateElementColor(mpage, mpage->mBentoTree->mRootBlock, mpage->mColor.size());
+        void mutateElement(bricolage::Page *mpage,bricolage::BentoBlock *bentoBlock, int ColorSize);
+        inline void mutateElement(bricolage::Page *mpage){
+            mutateElement(mpage, mpage->mBentoTree->mRootBlock, mpage->mColor.size());
         }
         int tournamentSelection(QList<QPair<double,int> > array, double tournamentSelectionParameter);
-        // int tournamentSelection(QList<int> indexlist,QList<double> fitnesslist);
+        QList<QPair<double,QString> > getNumberFromQString(const QString &str);
+        static QList<double> getNumberFromQString2(const QString &str);
+        static bool letssThan( const QString & e1, const QString & e2 );
+        bool isEven(int n);
+        double limMinMax(double value,double min,double max);
+        double limMinMax(double value,QString key);
+        QList<int> sortedIndex(QList<QPair<int,int> > parentList);
+        double calcemd(QVector<int> Q,QVector<int> P);
 
-        //uint fullSize(const bricolage::BentoBlock* bentoBlock);
-        //privade variables
+        //Private Variables
 
+        static const QStringList positionKeyList;
+        static const QStringList sizeKeyList;
+        static const QStringList textKeyList;
+        static const QStringList otherKeyList;
+        static const QStringList borderKeyList;
+        static const QStringList colorKeyList;
+        //and here shold be color if we did that same way...
         int currGeneration;
 
         //private Parameters for iga settings
@@ -115,7 +118,6 @@ namespace webocado{
         int eliteCopies;
         double mRateCE_t; //change to an existing
         double mRateCE_n; //change to a new (i.e add new color)
-
         double ColorRand;
         double ColorRot;
         double Colorhue_F;
@@ -153,74 +155,12 @@ namespace webocado{
         QList<QPair<double, QStringList> > evolveType;
         QList<QPair<int, int> > parents; //contians int of each parents
 
-        //            //For randomness:
-
+        //For randomness:
         typedef std::normal_distribution<double> distribution;
         distribution SizeNormRand;
         //add more rand here
         //distribution NormRand;
-        //move to .cpp, here because was inline before
-        QList<QPair<double,QString> > getNumberFromQString(const QString &str){
-            QList<QPair<double,QString> > list;
-            int pos = 0;
-            QRegExp rx("(-?\\d+(?:[\\.,]\\d+(?:e\\d+)?)?[a-zA-Z%]*)");
 
-            while ((pos = rx.indexIn(str, pos)) != -1) {
-                QRegExp rxnum("(-?\\d+(?:[\\.,]\\d+(?:e\\d+)?)?)");
-                QRegExp rxletters("([a-zA-Z%]+)");
-                QString s= rx.cap(1);
-
-                rxnum.indexIn(s);
-                QString number = rxnum.cap(1);
-                rxletters.indexIn(s);
-                QString text = rxletters.cap(1);
-
-                QPair<double,QString> newqpair;
-                newqpair.first=number.toDouble();
-                //                    if(stringout.size()<2){
-                //                        newqpair.second="";
-                //                    }else{
-                newqpair.second = text;// gives text after, ex. 14px => 14,"px"
-                //  }
-                list.append(newqpair);
-                //list << rxnum.cap(1).toDouble();
-                pos += rx.matchedLength();
-            }
-            return list;
-        }
-        /*double QStr2num(const QString &str){
-            QRegExp rxnum("(-?\\d+(?:[\\.,]\\d+(?:e\\d+)?)?)");
-            rxnum.indexIn(str, 0);
-            return rxnum.cap(1).toDouble();
-        }*/
-        static bool letssThan( const QString & e1, const QString & e2 ){
-
-            QList<double> list1=getNumberFromQString2(e1);
-            QList<double> list2=getNumberFromQString2(e2);
-
-            if(!list1.isEmpty()&&!list2.isEmpty()){
-                //qDebug() << endl << e1 << list1[0] << e2 << list2[0] << "is a number" << (list1[0] < list2[0]?"<":">") << endl;
-                return list1[0] < list2[0];
-            }
-            //qDebug() << endl << e1 << e2 << "is non number"<< (e1 < e2?"<":">")<< endl;
-            return e1<e2;
-        }
-        static QList<double> getNumberFromQString2(const QString &str){ //Move to a common file..
-            QList<double> list;
-            int pos = 0;
-            QRegExp rx("(-?\\d+(?:[\\.,]\\d+(?:e\\d+)?)?)");
-            while ((pos = rx.indexIn(str, pos)) != -1) {
-                list << rx.cap(1).toDouble();
-                pos += rx.matchedLength();
-            }
-            return list;
-        }
-        bool isEven(int n){ //move to a separate file
-            return floor(n/2)*2 == n;
-        }
-        double limMinMax(double value,double min,double max);
-        double limMinMax(double value,QString key);
-        QList<int> sortedIndex(QList<QPair<int,int> > parentList);
     };
 }
 #endif // IGAMAIN_H

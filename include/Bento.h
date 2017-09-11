@@ -8,7 +8,7 @@
 #include <QVarLengthArray>
 #include <QVector>
 #include <QWebElement>
-#include "DOMUtils.h"
+//#include "DOMUtils.h"
 #include "Separator.h"
 
 namespace bricolage{
