@@ -268,11 +268,12 @@ bool Page::saveImage(){
     webpageP->mainFrame()->render(&p);
     p.end();
     //todo, dont know if smoothed is better or worse. try both
-    image = tmpimg.scaled(100,100,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
+    image = tmpimg.scaled(1000,1000,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
     QString path=QDir::currentPath() + "/img" + dateTime + "/" + pID + ".png";
     if(!image.save(path)){
         qDebug() << "could not save file new way" << path;
     }
+    image = tmpimg.scaled(100,100,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
     return true; //set this to image.save(path);
 }
 void Page::createHistogram(){

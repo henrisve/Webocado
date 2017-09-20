@@ -75,8 +75,9 @@ public:
     }
 
     inline void updateStyles(){
-        if(!getUpdatedKeys().isEmpty())
+        if(!getUpdatedKeys().isEmpty()){
             updateStyles(mBentoTree->mRootBlock);
+        }
     }
 
     void updatePage(Page &newPage);

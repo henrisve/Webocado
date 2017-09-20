@@ -28,9 +28,7 @@ void Window::on_pushButton_clicked(){
 
     //Make it possible to get event from click on webwidget
 
-    for(int i=0;i<10000000;i++){
-        qrand();//some rand seem to need "warmup" dont know if that is the case here, but do it anyway
-    }
+
     qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
     setEnabled(false);
     QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
@@ -137,7 +135,8 @@ void Window::on_pushButton_clicked(){
         webPageVector.last()->mainFrame()->setUrl(QUrl(webURLlist[urlIndex]));
         webPageVector.last()->mainFrame()->setScrollBarPolicy( Qt::Horizontal, Qt::ScrollBarAlwaysOff );
         webPageVector.last()->mainFrame()->setScrollBarPolicy( Qt::Vertical, Qt::ScrollBarAlwaysOff );
-        webPageVector.last()->setViewportSize(QSize(1000,1000));//Todo, 1000 thing should not be hardcoded here!
+        //webPageVector.last()->setViewportSize(QSize(1000,1000));//Todo, 1000 thing should not be hardcoded here!
+
         webPageVector.last()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
         pageId.append(urlIndex);
     }
@@ -475,14 +474,29 @@ bool Window::eventFilter(QObject *object, QEvent *event){
         }
     }
     if (object == fitnessSlider && event->type() == QEvent::MouseButtonRelease) {
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         QMouseEvent * mouseEvent = static_cast<QMouseEvent *>(event);
         double newval =fitnessSlider->maximum()*((double)mouseEvent->x()/fitnessSlider->width());
         fitnessSlider->setValue(newval);
         qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
+        mainWeb_1->setPage(nineNumberPage[0]);
         setEnabled(false);
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 1000);
         if(igaObject->currIndividial==igaObject->popSize()-1){ //both this and next is always true at the same time.
             addToAncestryTree(newval);
         }
+        //save time to compute fitness
+        QFile file("slidertest.csv");
+
+        if (file.open(QIODevice::WriteOnly | QIODevice::Append)) {
+            QTextStream stream(&file);
+            stream.flush();
+            stream << myTimer.elapsed() << "," << newval << "," << igaObject->getCurrGen() << "," << igaObject->currIndividial << ","<< dateTime << "," <<
+                      QDateTime::currentDateTime().toString("MMddhhmms") << endl;
+
+        }
+        file.close();
+
         igaObject->nextIndividual(newval);
         if(igaObject->currIndividial==0){
             qDebug() << "new gen update colors:" << endl;
@@ -490,21 +504,27 @@ bool Window::eventFilter(QObject *object, QEvent *event){
             addToHtmlDistance();
             updateColorTable();
         }
+
         mainWeb_1->setPage(population[igaObject->currIndividial].webpageP);
         qDebug() << "Done, your turn!" << endl;
         myTimer.start();
         htmlView->document()->setPlainText(population[igaObject->currIndividial].getHtml());
         treeWidget->clear();
         examineChildElements(population[igaObject->currIndividial].mBentoTree->mRootBlock, treeWidget->invisibleRootItem());
+
+
+
         qApp->restoreOverrideCursor();
         setEnabled(true);
-
+        myTimer.start();
         event->ignore();
     }
+
     // The event will be correctly sent to the widget
     runFlag =false;
 
     return false;
+
     // If you want to stop the event propagation now:
     // return true
 
@@ -865,9 +885,9 @@ void Window::addToHtmlDistance(){
     QString newhtml="<div id=\"wrapper\">";
     for(int i=0;i<igaObject->popSize();i++){
         newhtml+="<div id=\"wrapper\">";
-        newhtml+="my<img src=\"" + igaObject->getCurrIName(i) + ".png\" style=\"width:"+QString::number(imgWidth)+"px;\"> : ";
+        newhtml+="<img src=\"" + igaObject->getCurrIName(i) + ".png\" style=\"width:"+QString::number(imgWidth)+"px;\"> : ";
         QList<QPair<double,int> > dList;
-        QList<QPair<double,int> > dListemd;
+        //QList<QPair<double,int> > dListemd;
         for(int j=0;j<igaObject->popSize();j++){
             if(j==i) continue;
             double dist=population[i].distanceMulti[j];
@@ -889,6 +909,7 @@ void Window::addToHtmlDistance(){
          newhtml+= "</div><br />";
          //For OMD TEST
          //Temp for emd test
+         /*
          for(int j=0;j<igaObject->popSize();j++){
              if(j==i) continue;
              double dist=population[i].distance[j];
@@ -910,6 +931,7 @@ void Window::addToHtmlDistance(){
                         "var ct = ca.getContext('2d');ct.beginPath();ct.rect(0, "+barHigthstr+",5, " + QString::number(-fitn*barHigth)+ ")"
                         ";ct.fillStyle = 'red';ct.fill();ct.stroke();</script>\n";
          }
+         */
          //To here
     }
     newhtml+= "</div><br />---------------<br />";

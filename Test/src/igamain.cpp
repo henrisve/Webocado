@@ -234,7 +234,7 @@ void igacado::nextGeneration(){
         }
     }
     if(!atleastOne){
-        evolveType[qrand()% evolveType.size()].first=5;
+        evolveType[qrand()% evolveType.size()].first=2;
 
     }
 
@@ -919,6 +919,17 @@ void igacado::calcHistDist(){
     int windows = population[0][0].histogram.size();
     int bins = population[0][0].histogram[0][0][0].size();
     int binPenalty=5;
+    bool writeFile=true;
+    QFile file("distdata.csv");
+    if (file.open(QIODevice::WriteOnly | QIODevice::Append) && writeFile) {
+       writeFile=true;
+       QTextStream stream(&file);
+       stream.flush();
+       stream <<  population[0][0].pID << ",";
+    }else{
+        writeFile=false;
+    }
+
 
     for(int i=0;i<popSize()-1;i++){
         bool useOldDist=false;
@@ -942,6 +953,10 @@ void igacado::calcHistDist(){
                 distemd=1-((distemd)/(windows*windows*5));
                 population[0][i].distanceMulti[j]=distemd;//dist;
                 population[0][j].distanceMulti[i]=distemd;//dist;
+                if(writeFile){
+                    QTextStream stream(&file);
+                    stream << distemd << ",";
+                }
             }
         }else{
             bricolage::Page* p1 = &population[0][i];
@@ -1067,6 +1082,7 @@ void igacado::calcHistDist(){
 
                 population[0][i].distance[j]=distemd;//dist;
                 population[0][j].distance[i]=distemd;//dist;
+
                 //double tmpSD1=1-(styleDist/20);
                 //double tmpSD2=1-(styleDist2/500);
                 //population[0][i].distanceMulti[j]=0;//(dist+dist+tmpSD1+tmpSD2)/4; //Check what solution is the best
@@ -1075,6 +1091,15 @@ void igacado::calcHistDist(){
             }
         }
     }
+
+    if(writeFile){
+        QTextStream stream(&file);
+        stream << endl;
+        file.close();
+    }
+
+
+
 }
 
 //#####################################################################
